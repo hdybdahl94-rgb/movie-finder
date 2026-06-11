@@ -232,23 +232,26 @@ select {
   color: #fff;
 }
 
-/* DESKTOP FIX */
+/* DESKTOP ONLY */
 @media (min-width: 768px) {
-  .container {
-    max-width: 600px;
+
+  /* Normalt view (med resultater) */
+  .container:not(.empty) {
+    max-width: 700px;
     margin: 0 auto;
+  }
+
+  @media (min-width: 768px) {
+
+  .container.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .container.empty .content {
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 420px;   /* nøkkelen */
+    width: 100%;
   }
 }
-
-
-@media (min-width: 768px) {
-  body {
-    display: flex;
-    justify-content: center;
-  }
 }
