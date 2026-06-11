@@ -1,13 +1,18 @@
 /* RESET */
-body {
+html, body, #root {
   margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(180deg, #111 0%, #111 40%, #181818 100%);
   color: #fff;
   font-size: 17px;
 }
 
-/* CONTAINER */
+/* CONTAINER – MOBIL */
 .container {
   width: 100%;
   min-height: 100dvh;
@@ -20,7 +25,7 @@ body {
   width: 100%;
 }
 
-/* EMPTY STATE (mobil først) */
+/* EMPTY SCREEN (mobil) */
 .container.empty .content {
   min-height: 100dvh;
 
@@ -28,7 +33,7 @@ body {
   flex-direction: column;
   justify-content: center;
 
-  padding-bottom: 40px; /* flytter litt opp -> bedre UX */
+  padding-bottom: 40px;
 }
 
 /* TITLE */
@@ -40,22 +45,32 @@ h1 {
 
 /* FORM */
 form {
-  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 18px;
 }
 
-/* INPUTS */
+/* CONTROLS */
 input,
 button,
 select {
   width: 100%;
-  padding: 20px;
+  padding: 18px;
   font-size: 18px;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
   box-sizing: border-box;
+}
+
+/* BUTTON FIX (like størrelse) */
+button {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e50914;
+  color: white;
+  font-weight: bold;
 }
 
 /* INPUT */
@@ -64,12 +79,10 @@ input {
   color: #fff;
 }
 
-/* BUTTON */
-button {
-  background: #e50914;
-  color: white;
-  font-weight: bold;
-  height: 64px;
+/* SELECT */
+select {
+  background: #222;
+  color: #fff;
 }
 
 /* RESULTS */
@@ -98,18 +111,7 @@ button {
   border-radius: 10px;
 }
 
-/* TEXT */
-.card-content h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.card-content p {
-  margin: 0;
-  font-size: 15px;
-}
-
-/* ✅ DESKTOP */
+/* DESKTOP FIX */
 @media (min-width: 768px) {
 
   body {
@@ -117,7 +119,6 @@ button {
     justify-content: center;
   }
 
-  /* EN kolonne i midten */
   .container {
     max-width: 600px;
   }
@@ -125,8 +126,8 @@ button {
   /* startskjerm */
   .container.empty {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
   }
 
   .container.empty .content {
