@@ -4,6 +4,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background: #111;
   color: #fff;
+
+  font-size: 16px; /* NY */
 }
 
 /* CONTAINER */
@@ -16,8 +18,8 @@ body {
 /* TITTEL */
 h1 {
   text-align: center;
-  font-size: 22px;
-  margin-bottom: 20px;
+  font-size: 24px;
+  margin-bottom: 12px;
 }
 
 /* FORM (sticky + clean layout) */
@@ -133,7 +135,7 @@ select {
 /* TITLE */
 .card-content h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.3;
 }
 
@@ -141,7 +143,7 @@ select {
 .card-content p {
   margin: 0;
   color: #cfcfcf;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1.4;
 
   display: -webkit-box;
@@ -161,7 +163,7 @@ select {
   background: #2a2a2a;
   padding: 5px 8px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
 
@@ -172,7 +174,7 @@ select {
 
 /* LABELS */
 .watch-label {
-  font-size: 12px;
+  font-size: 13px;
   margin: 0 0 6px 0;
   opacity: 0.75;
   color: #bdbdbd;
@@ -210,7 +212,7 @@ select {
 }
 
 .provider-item span {
-  font-size: 11px;
+  font-size: 13px;
   color: #fff;
   white-space: nowrap;
 }
@@ -239,11 +241,5 @@ select {
     height: 105px;
   }
 
-  .card-content h3 {
-    font-size: 15px;
-  }
-
-  .card-content p {
-    font-size: 13px;
-  }
+  
 }
