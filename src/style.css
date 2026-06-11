@@ -8,12 +8,21 @@ body {
   font-size: 16px; /* NY */
 }
 
-/* CONTAINER */
+
 .container {
   max-width: 600px;
   margin: 0 auto;
   padding: 12px;
+  min-height: 100vh;
 }
+
+/* KUN når det er tomt */
+.container.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 
 /* TITTEL */
 h1 {
