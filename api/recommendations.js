@@ -6,9 +6,13 @@ export default async function handler(req, res) {
     try {
         const { input, filter, model } = req.body;
 
-        if (!input || !input.trim()) {
-            return res.status(400).json({ error: "Missing input" });
+
+        let finalInput = input;
+
+        if (!finalInput || !finalInput.trim()) {
+            finalInput = "top rated movies and tv shows";
         }
+
 
         const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         const TMDB_API_KEY = process.env.TMDB_API_KEY;
@@ -246,8 +250,7 @@ export default async function handler(req, res) {
 
         // 1. Be Gemini foreslå titler
         const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${
-                model || "gemini-3.1-flash-lite"
+            `https://generativelanguage.googleapis.com/v1beta/models/${model || "gemini-3.1-flash-lite"
             }:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: "POST",
@@ -263,7 +266,7 @@ export default async function handler(req, res) {
 Du er en filmassistent.
 
 Brukerens input:
-"${input}"
+"${finalInput}"
 
 Oppgave:
 1. Hvis input er en spesifikk film eller TV-serie:
@@ -273,13 +276,12 @@ Oppgave:
 2. Hvis input er en generell beskrivelse:
    - gi 5 relevante forslag basert på ønsket
 
-Gi meg 5 ${
-    filter === "tv"
-        ? "TV-serier"
-        : filter === "movie"
-        ? "filmer"
-        : "filmer eller TV-serier"
-}.
+Gi meg 5 ${filter === "tv"
+                                            ? "TV-serier"
+                                            : filter === "movie"
+                                                ? "filmer"
+                                                : "filmer eller TV-serier"
+                                        }.
 
 Regler:
 - Hvis TV-serier er valgt: foreslå KUN serier
@@ -332,8 +334,8 @@ Format:
                         filter === "tv"
                             ? "tv"
                             : filter === "movie"
-                            ? "movie"
-                            : null,
+                                ? "movie"
+                                : null,
                     title: item.title,
                     description: item.description,
                     poster: "",
@@ -372,7 +374,7 @@ Format:
         // 3. Hvis bruker skrev en spesifikk tittel: legg til både film og serie hvis de finnes
         if (input && input.trim().length < 50) {
             try {
-                const directMatches = await searchTMDBDirectBoth(input);
+                const directMatches = await searchTMDBDirectBoth(input.trim);
 
                 const itemsToAdd = [];
 

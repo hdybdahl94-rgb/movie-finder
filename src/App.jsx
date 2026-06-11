@@ -22,6 +22,7 @@ const getProviderLabel = (type) => {
     return "Tilgjengelig på";
 };
 
+
 export default function App() {
     const [input, setInput] = useState("");
     const [result, setResult] = useState([]);
@@ -40,6 +41,41 @@ export default function App() {
     useEffect(() => {
         localStorage.setItem("model", model);
     }, [model]);
+
+    const handleRandom = async () => {
+        setLoading(true);
+
+        const inputs = [
+            "highly rated movies",
+            "best imdb movies",
+            "top rated films",
+            "critically acclaimed tv shows",
+            "top rated series"
+        ];
+
+        const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
+
+        try {
+            const res = await fetch("/api/recommendations", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    input: randomInput,
+                    filter,
+                    model: "gemini-3.1-flash-lite"
+                })
+            });
+
+            const data = await res.json();
+            setResult(data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const askAI = async () => {
         if (!input.trim()) return;
@@ -97,6 +133,11 @@ export default function App() {
                 <button type="submit" disabled={loading}>
                     {loading ? "Laster..." : "Finn filmer eller serier"}
                 </button>
+
+                <button className="btn-primary" onClick={handleRandom}>
+                    Gi meg noe bra 🎬
+                </button>
+
             </form>
 
             {/* Modellvalg */}
@@ -205,7 +246,7 @@ export default function App() {
                                 </div>
 
                                 {movie.providers &&
-                                movie.providers.length > 0 ? (
+                                    movie.providers.length > 0 ? (
                                     <div className="watch-section">
                                         <p className="watch-label">
                                             {getProviderLabel(
