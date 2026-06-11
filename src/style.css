@@ -8,9 +8,9 @@ body {
 
 /* CONTAINER */
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px;
 }
 
 /* TITTEL */
@@ -18,6 +18,19 @@ h1 {
   text-align: center;
   font-size: 22px;
   margin-bottom: 20px;
+}
+
+/* FORM (sticky + clean layout) */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #111;
+  padding-bottom: 8px;
 }
 
 /* INPUT, BUTTON, SELECT */
@@ -29,7 +42,6 @@ select {
   font-size: 16px;
   border-radius: 12px;
   border: none;
-  margin-bottom: 10px;
   box-sizing: border-box;
 }
 
@@ -45,6 +57,11 @@ button {
   color: white;
   font-weight: bold;
   cursor: pointer;
+  transition: transform 0.1s ease, opacity 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.98);
 }
 
 button:disabled {
@@ -61,7 +78,9 @@ select {
 
 /* RESULT LIST */
 .results {
-  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 /* CARD */
@@ -71,38 +90,64 @@ select {
   background: #1a1a1a;
   border-radius: 14px;
   padding: 12px;
-  margin-bottom: 12px;
   align-items: flex-start;
+
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.1s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.card:active {
+  transform: scale(0.98);
+  background: #222;
 }
 
 /* POSTER */
 .poster {
-  width: 90px;
-  min-width: 90px;
-  height: 135px;
+  width: 80px;
+  min-width: 80px;
+  height: 120px;
   object-fit: cover;
   border-radius: 10px;
   background: #333;
 }
 
+/* FALLBACK */
+.poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+  text-align: center;
+}
+
 /* CARD CONTENT */
 .card-content {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* TITLE */
 .card-content h3 {
-  margin: 0 0 6px 0;
-  font-size: 17px;
+  margin: 0;
+  font-size: 16px;
   line-height: 1.3;
 }
 
-/* DESCRIPTION */
+/* DESCRIPTION (clamped) */
 .card-content p {
-  margin: 0 0 10px 0;
+  margin: 0;
   color: #cfcfcf;
   font-size: 14px;
   line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* RATINGS */
@@ -114,55 +159,18 @@ select {
 
 .ratings span {
   background: #2a2a2a;
-  padding: 6px 10px;
+  padding: 5px 8px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
-/* OPTIONAL: SMALL DEVICES FINISHING TOUCH */
-@media (max-width: 400px) {
-  .poster {
-    width: 75px;
-    min-width: 75px;
-    height: 110px;
-  }
-
-  .card-content h3 {
-    font-size: 15px;
-  }
-
-  .card-content p {
-    font-size: 13px;
-  }
-}
-
-.providers {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.providers img {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: #fff;
-}
-
-.poster-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 12px;
-  text-align: center;
-}
-
+/* WATCH SECTION */
 .watch-section {
-  margin-top: 10px;
+  margin-top: 6px;
 }
 
+/* LABELS */
 .watch-label {
   font-size: 12px;
   margin: 0 0 6px 0;
@@ -177,34 +185,37 @@ select {
   color: #bdbdbd;
 }
 
+/* PROVIDERS */
 .providers {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
+/* PROVIDER ITEM */
 .provider-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   background: #252525;
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 4px 8px;
 }
 
 .provider-item img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 6px;
   background: #fff;
 }
 
 .provider-item span {
-  font-size: 12px;
+  font-size: 11px;
   color: #fff;
   white-space: nowrap;
 }
 
+/* WATCH LINK */
 .watch-link {
   display: inline-block;
   margin-top: 4px;
@@ -218,4 +229,21 @@ select {
 
 .watch-link:hover {
   background: #333;
+}
+
+/* SMALL DEVICES */
+@media (max-width: 400px) {
+  .poster {
+    width: 70px;
+    min-width: 70px;
+    height: 105px;
+  }
+
+  .card-content h3 {
+    font-size: 15px;
+  }
+
+  .card-content p {
+    font-size: 13px;
+  }
 }
