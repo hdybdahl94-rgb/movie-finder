@@ -1,4 +1,4 @@
-/* RESET + BASE */
+/* RESET */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
@@ -10,47 +10,43 @@ body {
 /* CONTAINER */
 .container {
   width: 100%;
+  min-height: 100dvh;
   padding: 16px;
+  box-sizing: border-box;
 }
 
-/* EMPTY MODE (før søk) */
-.container.empty {
-  height: 100dvh;
-}
-
-/* FULLSCREEN CONTENT */
-.container.empty .content {
-  height: 100%;
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;  /* vertikal center */
-  
-  padding: 20px;
-}
-
-/* NORMAL CONTENT */
+/* CONTENT */
 .content {
   width: 100%;
 }
 
-/* TITTEL */
+/* EMPTY STATE (mobil først) */
+.container.empty .content {
+  min-height: 100dvh;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-bottom: 40px; /* flytter litt opp -> bedre UX */
+}
+
+/* TITLE */
 h1 {
   text-align: center;
-  font-size: 28px;
+  font-size: 26px;
   margin-bottom: 20px;
 }
 
 /* FORM */
 form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  width: 100%;
 }
 
-/* INPUT, BUTTON, SELECT */
+/* INPUTS */
 input,
 button,
 select {
@@ -73,32 +69,15 @@ button {
   background: #e50914;
   color: white;
   font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.1s ease, background 0.1s ease;
+  height: 64px;
 }
 
-button:active {
-  transform: scale(0.97);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* SELECT */
-select {
-  background: #222;
-  color: #fff;
-  appearance: none;
-}
-
-/* RESULT LIST */
+/* RESULTS */
 .results {
+  margin-top: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 16px;
 }
 
 /* CARD */
@@ -108,14 +87,6 @@ select {
   background: #1a1a1a;
   border-radius: 14px;
   padding: 12px;
-  cursor: pointer;
-  transition: transform 0.1s ease, background 0.1s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.card:active {
-  transform: scale(0.97);
-  background: #222;
 }
 
 /* POSTER */
@@ -125,124 +96,33 @@ select {
   height: 120px;
   object-fit: cover;
   border-radius: 10px;
-  background: #333;
 }
 
-/* FALLBACK */
-.poster-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #999;
-  font-size: 12px;
-  text-align: center;
-}
-
-/* CARD CONTENT */
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* TITLE */
+/* TEXT */
 .card-content h3 {
   margin: 0;
   font-size: 18px;
 }
 
-/* DESCRIPTION */
 .card-content p {
   margin: 0;
   font-size: 15px;
-  color: #ccc;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
-/* RATINGS */
-.ratings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.ratings span {
-  background: #2a2a2a;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 13px;
-}
-
-/* WATCH */
-.watch-section {
-  margin-top: 6px;
-}
-
-.watch-label {
-  font-size: 13px;
-  opacity: 0.8;
-}
-
-.watch-label-muted {
-  font-size: 13px;
-  opacity: 0.6;
-}
-
-/* PROVIDERS */
-.providers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.provider-item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: #252525;
-  border-radius: 999px;
-  padding: 4px 8px;
-}
-
-.provider-item img {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  background: #fff;
-}
-
-.provider-item span {
-  font-size: 13px;
-}
-
-/* LINK */
-.watch-link {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 8px 12px;
-  background: #2a2a2a;
-  border-radius: 999px;
-  font-size: 13px;
-  text-decoration: none;
-  color: #fff;
-}
-
-/* DESKTOP ONLY */
+/* ✅ DESKTOP */
 @media (min-width: 768px) {
 
-  /* Normalt view (med resultater) */
-  .container:not(.empty) {
-    max-width: 700px;
-    margin: 0 auto;
+  body {
+    display: flex;
+    justify-content: center;
   }
 
-  @media (min-width: 768px) {
+  /* EN kolonne i midten */
+  .container {
+    max-width: 600px;
+  }
 
+  /* startskjerm */
   .container.empty {
     display: flex;
     align-items: center;
@@ -250,8 +130,7 @@ select {
   }
 
   .container.empty .content {
-    max-width: 420px;   /* nøkkelen */
-    width: 100%;
+    min-height: auto;
+    max-width: 420px;
   }
-}
 }
