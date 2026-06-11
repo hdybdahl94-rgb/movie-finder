@@ -25,10 +25,11 @@ body {
 
 
 .container.empty .content {
-  max-width: 420px;
+  max-width: 100%;
   width: 100%;
   transform: scale(1.05);
   margin-top: -60px;
+  padding: 0 10px;
 }
 
 
@@ -45,7 +46,7 @@ body {
 /* TITTEL */
 h1 {
   text-align: center;
-  font-size: 24px;
+  font-size: 26px;
   margin-bottom: 12px;
 }
 
@@ -61,8 +62,8 @@ input,
 button,
 select {
   width: 100%;
-  padding: 16px;
-  font-size: 17px;
+  padding: 18px;
+  font-size: 18px;
   border-radius: 14px;
   border: none;
   box-sizing: border-box;
