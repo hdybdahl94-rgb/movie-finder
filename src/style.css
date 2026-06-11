@@ -1,23 +1,31 @@
 /* RESET */
 html, body, #root {
   margin: 0;
+  padding: 0;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(180deg, #111 0%, #111 40%, #181818 100%);
+  background: #111;
   color: #fff;
-  font-size: 17px;
+  font-size: 18px;
 }
 
-/* CONTAINER – MOBIL */
+/* APP CONTAINER */
 .container {
   width: 100%;
   min-height: 100dvh;
-  padding: 16px;
   box-sizing: border-box;
+  padding: 14px;
+}
+
+/* EMPTY STATE = startskjerm */
+.container.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* CONTENT */
@@ -25,113 +33,293 @@ body {
   width: 100%;
 }
 
-/* EMPTY SCREEN (mobil) */
+/* Når det ikke finnes resultater:
+   stor blokk som fyller skjermen og ligger omtrent midt */
 .container.empty .content {
+  width: 100%;
   min-height: 100dvh;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
-
-  padding-bottom: 40px;
+  padding: 8px 0 40px 0;
+  box-sizing: border-box;
 }
 
-/* TITLE */
+/* TITTEL */
 h1 {
   text-align: center;
-  font-size: 26px;
-  margin-bottom: 20px;
+  font-size: 2rem;
+  line-height: 1.2;
+  margin: 0 0 20px 0;
+  font-weight: 700;
 }
 
 /* FORM */
 form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
+  width: 100%;
 }
 
-/* CONTROLS */
+/* INPUT / BUTTON / SELECT */
 input,
 button,
 select {
   width: 100%;
-  padding: 18px;
-  font-size: 18px;
-  border-radius: 14px;
+  min-height: 64px;
+  padding: 18px 16px;
+  font-size: 1.05rem;
+  border-radius: 18px;
   border: none;
   box-sizing: border-box;
 }
 
-/* BUTTON FIX (like størrelse) */
+/* INPUT */
+input {
+  background: #202020;
+  color: #fff;
+  outline: none;
+}
+
+input::placeholder {
+  color: #8f8f8f;
+}
+
+/* BUTTON */
 button {
-  height: 64px;
+  background: #e12d12;
+  color: #fff;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e50914;
-  color: white;
-  font-weight: bold;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* INPUT */
-input {
-  background: #222;
-  color: #fff;
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.65;
 }
 
 /* SELECT */
 select {
-  background: #222;
-  color: #fff;
+  background: #f2f2f2;
+  color: #111;
+  appearance: none;
+  font-weight: 500;
+}
+
+/* HJELPETEKST */
+.help-text,
+.container p.helper-text {
+  font-size: 0.95rem;
+  opacity: 0.75;
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+/* INLINE INFO-TEXT hvis du fortsatt bruker inline style på <p> */
+.container p {
+  line-height: 1.4;
+}
+
+/* ERROR */
+.error-box {
+  background: #3a1f1f;
+  color: #ffb4b4;
+  padding: 14px;
+  border-radius: 14px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  font-size: 1rem;
 }
 
 /* RESULTS */
 .results {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  margin-top: 18px;
 }
 
 /* CARD */
 .card {
   display: flex;
   gap: 12px;
-  background: #1a1a1a;
-  border-radius: 14px;
+  background: #1c1c1c;
+  border-radius: 16px;
   padding: 12px;
+  box-sizing: border-box;
 }
 
 /* POSTER */
 .poster {
-  width: 80px;
-  min-width: 80px;
-  height: 120px;
+  width: 92px;
+  min-width: 92px;
+  height: 138px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
+  background: #333;
 }
 
-/* DESKTOP FIX */
-@media (min-width: 768px) {
+.poster-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #aaa;
+  font-size: 0.8rem;
+  padding: 6px;
+}
 
-  body {
-    display: flex;
-    justify-content: center;
-  }
+/* CARD CONTENT */
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
 
+/* TITLE */
+.card-content h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.3;
+  font-weight: 700;
+}
+
+/* DESCRIPTION */
+.card-content p {
+  margin: 0;
+  color: #d0d0d0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* RATINGS */
+.ratings {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ratings span {
+  background: #2b2b2b;
+  padding: 7px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* WATCH SECTION */
+.watch-section {
+  margin-top: 4px;
+}
+
+.watch-label,
+.watch-label-muted {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  color: #c7c7c7;
+}
+
+.watch-label-muted {
+  opacity: 0.7;
+}
+
+/* PROVIDERS */
+.providers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.provider-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #262626;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.provider-item img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.provider-item span {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* JUSTWATCH LINK */
+.watch-link {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: #2a2a2a;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+/* SMÅ MOBILER */
+@media (max-width: 380px) {
   .container {
-    max-width: 600px;
+    padding: 12px;
   }
 
-  /* startskjerm */
-  .container.empty {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  input,
+  button,
+  select {
+    min-height: 60px;
+    padding: 16px 14px;
+    font-size: 1rem;
+  }
+
+  .poster {
+    width: 82px;
+    min-width: 82px;
+    height: 124px;
+  }
+
+  .card-content h3 {
+    font-size: 1rem;
+  }
+
+  .card-content p {
+    font-size: 0.92rem;
+  }
+}
+
+/* DESKTOP – kun en liten demping, ikke fokus */
+@media (min-width: 900px) {
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
   }
 
   .container.empty .content {
-    min-height: auto;
-    max-width: 420px;
+    max-width: 680px;
+    margin: 0 auto;
   }
 }
