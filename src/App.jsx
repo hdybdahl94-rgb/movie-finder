@@ -126,6 +126,7 @@ export default function App() {
                         askAI();
                     }}
                 >
+                    {/* 1. Det store tekstfeltet */}
                     <input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
@@ -133,52 +134,51 @@ export default function App() {
                         autoFocus
                     />
 
+                    {/* 2. NYTT: Filter-chips (Lagt flatt rett under tekstfeltet) */}
+                    <div className="filter-group">
+                        <label className="checkbox-container">
+                            <input
+                                type="radio"
+                                name="mediaFilter"
+                                value="all"
+                                checked={filter === "all"}
+                                onChange={(e) => setFilter(e.target.value)}
+                            />
+                            <span className="checkmark">Alle</span>
+                        </label>
+
+                        <label className="checkbox-container">
+                            <input
+                                type="radio"
+                                name="mediaFilter"
+                                value="movie"
+                                checked={filter === "movie"}
+                                onChange={(e) => setFilter(e.target.value)}
+                            />
+                            <span className="checkmark">Filmer</span>
+                        </label>
+
+                        <label className="checkbox-container">
+                            <input
+                                type="radio"
+                                name="mediaFilter"
+                                value="tv"
+                                checked={filter === "tv"}
+                                onChange={(e) => setFilter(e.target.value)}
+                            />
+                            <span className="checkmark">Serier</span>
+                        </label>
+                    </div>
+
+                    {/* 3. Hovedknappene */}
                     <button type="submit" disabled={loading}>
                         {loading ? "Laster..." : "Finn filmer eller serier"}
                     </button>
 
-                    <button className="btn-primary" onClick={handleRandom}>
+                    <button type="button" className="btn-primary" onClick={handleRandom}>
                         Gi meg noe bra 🎬
                     </button>
-
                 </form>
-
-                {/* Modellvalg */}
-                <div style={{ marginTop: "12px" }}>
-                    <select
-                        value={model}
-                        onChange={(e) => setModel(e.target.value)}
-                    >
-                        {MODELS.map((m) => (
-                            <option key={m.id} value={m.id}>
-                                {m.label}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* Filter */}
-                <div style={{ marginTop: "10px", marginBottom: "10px" }}>
-                    <select
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                    >
-                        <option value="all">Alle</option>
-                        <option value="movie">🎬 Kun filmer</option>
-                        <option value="tv">📺 Kun serier</option>
-                    </select>
-                </div>
-
-                <p
-                    style={{
-                        fontSize: "12px",
-                        opacity: 0.7,
-                        marginTop: "6px",
-                        marginBottom: "16px"
-                    }}
-                >
-                    Velg hvor kraftig AI du vil bruke
-                </p>
 
                 {error && (
                     <div
@@ -194,6 +194,7 @@ export default function App() {
                     </div>
                 )}
 
+                {/* Resultatvisning */}
                 <div className="results">
                     {result
                         .filter((movie) => {
@@ -248,14 +249,10 @@ export default function App() {
                                         )}
                                     </div>
 
-                                    {movie.providers &&
-                                        movie.providers.length > 0 ? (
+                                    {movie.providers && movie.providers.length > 0 ? (
                                         <div className="watch-section">
                                             <p className="watch-label">
-                                                {getProviderLabel(
-                                                    movie.providerType
-                                                )}
-                                                :
+                                                {getProviderLabel(movie.providerType)}:
                                             </p>
 
                                             <div className="providers">

@@ -20,75 +20,154 @@ html, body, #root {
 }
 
 /* ==========================================================================
-   2. CONTAINER & LAYOUT (Sluppet helt fri til kantene)
+   2. CONTAINER & LAYOUT (Full skjermbredde for listevisning)
    ========================================================================== */
-.container.empty {
+.container {
   width: 100% !important;
-  height: 100% !important;
-  min-height: 100dvh !important;
-  display: flex !important;
-  flex-direction: column !important;
-  background-color: #111111 !important;
-  padding: 0 24px !important; 
+  max-width: 1200px !important; /* Lar resultatene bruke hele skjermbredden */
+  margin: 0 auto !important;
+  padding: 24px 16px !important;
   box-sizing: border-box !important;
 }
 
-.container.empty .content {
+/* Når appen er tom (før søk) sentreres innholdet vertikalt */
+.container.empty {
+  min-height: 80vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0 24px !important;
+}
+
+.container .content {
   display: flex !important;
   flex-direction: column !important;
   width: 100% !important;
-  height: 100% !important;
   flex-grow: 1 !important;
   justify-content: flex-start !important;
-  /* Økt gap til 24px så de massive knappene ikke føles "kvalt" */
   gap: 24px !important; 
 }
 
 /* ==========================================================================
    3. MASSIV OVERSKRIFT
    ========================================================================== */
-.container.empty h1 {
-  /* Justert til 10% av skjermhøyden så de giga knappene under får god plass */
-  margin-top: 10dvh !important; 
+.container h1 {
+  margin-top: 5dvh !important; 
   margin-bottom: 20px !important; 
-  
-  font-size: 58px !important; /* Ekstremt tung og cinematic tittel */
+  font-size: 58px !important;
   font-weight: 900 !important;
   text-align: center !important;
   line-height: 1.05 !important;
   letter-spacing: -2px !important;
 }
 
+.container.empty h1 {
+  margin-top: 10dvh !important; 
+}
+
 /* ==========================================================================
-   4. FORMKONTROLLER & GRUPPERING
+   4. FORM & RADIOMENY (Kompakt og sentrert på toppen)
    ========================================================================== */
-.container.empty form {
+.container form {
   display: flex !important;
   flex-direction: column !important;
-  gap: 24px !important; /* Matcher gapet på utsiden perfekt */
+  gap: 24px !important; 
   width: 100% !important;
+  max-width: 500px !important; /* Holder søkefeltdelen kompakt og sentrert */
+  margin: 0 auto !important;
+}
+
+/* Filtergruppe for radioknapper */
+.container .filter-group {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center !important; 
+  gap: 28px !important; 
+  width: 100% !important;
+  padding: 4px 0 !important;
+}
+
+.container .checkbox-container {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important; 
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+/* Selve radio-sirkelen */
+.container .checkbox-container input[type="radio"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  height: 22px !important;
+  width: 22px !important;
   margin: 0 !important;
+  border: 2px solid #44444a !important; 
+  border-radius: 50% !important;
+  background-color: #1c1c1e !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Rød prikk inni radioknapp */
+.container .checkbox-container input[type="radio"]::after {
+  content: "" !important;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  background-color: #e50914 !important; 
+  display: block !important;
+  transform: scale(0) !important; 
+  transition: transform 0.12s ease !important;
+}
+
+.container .checkbox-container input[type="radio"]:checked {
+  border-color: #e50914 !important;
+}
+
+.container .checkbox-container input[type="radio"]:checked::after {
+  transform: scale(1) !important;
+}
+
+/* Teksten til radioknappene */
+.container .checkmark {
+  display: inline !important;
+  height: auto !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #a2a2a9 !important; 
+  font-size: 16px !important;
+  font-weight: 700 !important;
+}
+
+.container .checkbox-container input[type="radio"]:checked ~ .checkmark {
+  color: #ffffff !important;
 }
 
 /* Nullstiller wrapper-divene til dropdown-menyene */
-.container.empty .content > div {
+.container .content > div {
   width: 100% !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
 /* Bunnteksten pushes helt til bunnen av skjermen */
-.container.empty .content > p {
+.container .content > p {
   font-size: 16px !important;
   opacity: 0.35 !important;
   text-align: center !important;
   line-height: 1.4 !important;
   margin-top: auto !important; 
   margin-bottom: 0 !important;
+  padding-top: 40px !important;
   padding-bottom: 40px !important; 
 }
 
-/* Skjuler resultatboksen i denne tilstanden */
+/* Skjuler resultatboksen kun i tom tilstand */
 .container.empty .results {
   display: none !important;
 }
@@ -96,14 +175,14 @@ html, body, #root {
 /* ==========================================================================
    5. GIGANTISKE APPFELT OG KNAPPER (Maksimal Touch-UX)
    ========================================================================== */
-.container.empty input,
-.container.empty button,
-.container.empty select {
+.container input,
+.container button,
+.container select {
   width: 100% !important;
-  height: 96px !important;          /* Nå snakker vi! 96px høyde fyller skjermen brutalt bra */
-  border-radius: 28px !important;   /* Enda dypere og rundere hjørner for å matche den massive stilen */
-  font-size: 28px !important;       /* Giga skriftstørrelse som er umulig å misse */
-  font-weight: 900 !important;      /* Maksimal fontvekt for et kompromissløst uttrykk */
+  height: 96px !important;          /* 96px høyde fyller skjermen brutalt bra */
+  border-radius: 28px !important;   /* Dype, runde hjørner som matcher den massive stilen */
+  font-size: 28px !important;       /* Giga skriftstørrelse */
+  font-weight: 900 !important;      /* Maksimal fontvekt */
   font-family: inherit !important;
   box-sizing: border-box !important;
   border: none !important;
@@ -117,27 +196,109 @@ html, body, #root {
 }
 
 /* Tekstfeltet og Dropdown-menyene */
-.container.empty input,
-.container.empty select {
+.container input,
+.container select {
   background-color: #1c1c1e !important;
   color: #ffffff !important;
-  border: 3.5px solid #2c2c2e !important; /* Tykkere ramme så det står i stil med størrelsen */
+  border: 3.5px solid #2c2c2e !important;
 }
 
-.container.empty input::placeholder {
+.container input::placeholder {
   color: #555559 !important;
 }
 
 /* De røde Netflix-knappene */
-.container.empty button {
+.container button {
   background-color: #e50914 !important;
   color: #ffffff !important;
   cursor: pointer !important;
-  box-shadow: 0 12px 36px rgba(229, 9, 20, 0.3); /* Tyngre skygge for de store knappene */
+  box-shadow: 0 12px 36px rgba(229, 9, 20, 0.3);
   transition: transform 0.1s ease;
 }
 
-.container.empty button:active {
+.container button:active {
   background-color: #b80710 !important;
-  transform: scale(0.96) !important; /* Litt mer merkbar klikk-respons siden knappen er større */
+  transform: scale(0.96) !important;
+}
+
+/* ==========================================================================
+   6. FILM- OG SERIERESULTATER (Full bredde listevisning under hverandre)
+   ========================================================================== */
+.results {
+  display: flex !important;
+  flex-direction: column !important; /* Tvinger kortene strengt under hverandre */
+  gap: 16px !important; /* Jevnt mellomrom mellom kortene */
+  width: 100% !important; /* Tar 100% av den nye, brede containeren */
+  margin-top: 40px !important;
+  padding-bottom: 60px !important;
+}
+
+/* Hvert enkelt filmkort strekker seg over hele bredden */
+.results > div {
+  display: grid !important;
+  /* Bildet låses til 100px, all info tar resten av den brede skjermen */
+  grid-template-columns: 100px 1fr !important; 
+  column-gap: 20px !important;
+  row-gap: 2px !important;
+  
+  background: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 12px !important;
+  padding: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  align-items: start !important;
+}
+
+/* Fikser filmplakaten på venstre side */
+.results > div > img:first-of-type {
+  grid-column: 1 !important;
+  grid-row: 1 / span 20 !important; /* Låser bildet uforstyrret i sin kolonne */
+  width: 100px !important;
+  height: 150px !important; /* Perfekt, solid 2:3-format */
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin: 0 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Tvinger all tekst, info og logoer over i høyre kolonne */
+.results > div > *:not(img:first-of-type) {
+  grid-column: 2 !important;
+}
+
+/* Justering av titler */
+.results h2, .results h3, .results strong {
+  font-size: 18px !important; /* Litt mer tilstede siden vi har god plass */
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin: 0 0 6px 0 !important;
+}
+
+/* Beskrivelse og metadata (IMDb osv.) */
+.results p, .results span {
+  font-size: 14px !important;
+  color: #a1a1aa !important;
+  line-height: 1.5 !important;
+  margin: 0 0 6px 0 !important;
+}
+
+/* Sørger for at "Se på:"-teksten får litt luft over seg */
+.results p:has(img), .results div:has(img) {
+  margin-top: 10px !important;
+}
+
+/* Strømmetjeneste-logoer (Viaplay, Netflix osv.) */
+.results img[alt*="Viaplay"],
+.results img[alt*="Netflix"],
+.results img[alt*="Showtime"],
+.results img[alt*="Strim"],
+.results div[style*="background-image"] {
+  width: 24px !important;
+  height: 24px !important;
+  display: inline-block !important;
+  margin-right: 8px !important;
+  border-radius: 6px !important;
+  vertical-align: middle !important;
 }
