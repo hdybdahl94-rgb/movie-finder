@@ -1,325 +1,164 @@
+/* 1. Global box-sizing er en livredder. Dette forhindrer at padding sprenger høyden/bredden. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* RESET */
-html, body, #root {
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;
+  height: 100%; /* Endret fra min-height til height */
 }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, sans-serif;
   background: #111;
   color: #fff;
-  font-size: 18px;
 }
 
-/* APP CONTAINER */
-.container {
+/* Gjør #root til en flex-container som fyller hele mobilskjermen */
+#root {
   width: 100%;
-  min-height: 100dvh;
-  box-sizing: border-box;
-  padding: 14px;
-}
-
-/* EMPTY STATE = startskjerm */
-.container.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* CONTENT */
-.content {
-  width: 100%;
-}
-
-/* Når det ikke finnes resultater:
-   stor blokk som fyller skjermen og ligger omtrent midt */
-.container.empty .content {
-  width: 100%;
-  min-height: 100dvh;
+  min-height: 100dvh; 
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: 8px 0 40px 0;
-  box-sizing: border-box;
 }
 
-/* TITTEL */
+/* CONTAINER */
+.container {
+  width: 100%;
+  flex: 1; /* Gjør at den automatisk fyller all ledig plass i #root */
+  padding: 12px;
+  display: flex; /* Gjør container til flex, slik at barna også kan bruke flex: 1 */
+  flex-direction: column;
+  align-items: center; /* Holder innholdet sentrert */
+}
+
+.container.empty .content {
+  width: 100%;
+  flex: 1; /* Erstatt min-height: 100dvh med flex: 1 */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* EXTREMT viktig */
+  text-align: center;
+  padding: 24px 14px 40px;
+}
+
+/* TITLE */
 h1 {
   text-align: center;
-  font-size: 2rem;
-  line-height: 1.2;
+  font-size: 2.3rem;  /* ↑ ca 50% */
   margin: 0 0 20px 0;
-  font-weight: 700;
 }
 
 /* FORM */
 form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  width: 100%;
+  gap: 18px;
 }
 
-/* INPUT / BUTTON / SELECT */
+/* INPUT, BUTTON, SELECT */
 input,
 button,
 select {
   width: 100%;
-  min-height: 64px;
-  padding: 18px 16px;
-  font-size: 1.05rem;
-  border-radius: 18px;
+text-align: center;
+  padding: 22px;       /* ↑ */
+  font-size: 1.25rem;  /* ↑ */
+
+  border-radius: 20px;
   border: none;
   box-sizing: border-box;
 }
 
 /* INPUT */
 input {
-  background: #202020;
+  background: #222;
   color: #fff;
-  outline: none;
-}
-
-input::placeholder {
-  color: #8f8f8f;
 }
 
 /* BUTTON */
 button {
-  background: #e12d12;
-  color: #fff;
-  font-weight: 700;
+  height: 72px; /* lik + større */
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  -webkit-tap-highlight-color: transparent;
+
+  background: #e50914;
+  color: #fff;
+  font-weight: 700;
 }
 
 button:active {
-  transform: scale(0.98);
-}
-
-button:disabled {
-  opacity: 0.65;
+  transform: scale(0.97);
 }
 
 /* SELECT */
 select {
-  background: #f2f2f2;
+  background: #f1f1f1;
   color: #111;
-  appearance: none;
-  font-weight: 500;
 }
 
 /* HJELPETEKST */
-.help-text,
-.container p.helper-text {
-  font-size: 0.95rem;
-  opacity: 0.75;
-  margin-top: 10px;
-  margin-bottom: 0;
-}
-
-/* INLINE INFO-TEXT hvis du fortsatt bruker inline style på <p> */
-.container p {
-  line-height: 1.4;
-}
-
-/* ERROR */
-.error-box {
-  background: #3a1f1f;
-  color: #ffb4b4;
-  padding: 14px;
-  border-radius: 14px;
-  margin-top: 12px;
-  margin-bottom: 12px;
+.helper-text {
+  text-align: center;
   font-size: 1rem;
+  opacity: 0.7;
+  margin-top: 20px;
 }
 
 /* RESULTS */
 .results {
+  margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 18px;
+  gap: 16px;
 }
 
 /* CARD */
 .card {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   background: #1c1c1c;
-  border-radius: 16px;
-  padding: 12px;
-  box-sizing: border-box;
+  border-radius: 18px;
+  padding: 14px;
 }
 
 /* POSTER */
 .poster {
-  width: 92px;
-  min-width: 92px;
-  height: 138px;
-  object-fit: cover;
+  width: 100px;      /* ↑ */
+  min-width: 100px;
+  height: 150px;     /* ↑ */
   border-radius: 12px;
-  background: #333;
 }
 
-.poster-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: #aaa;
-  font-size: 0.8rem;
-  padding: 6px;
-}
-
-/* CARD CONTENT */
-.card-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-/* TITLE */
+/* TEXT */
 .card-content h3 {
-  margin: 0;
-  font-size: 1.08rem;
-  line-height: 1.3;
-  font-weight: 700;
+  font-size: 1.2rem;
 }
 
-/* DESCRIPTION */
 .card-content p {
-  margin: 0;
-  color: #d0d0d0;
-  font-size: 0.98rem;
-  line-height: 1.45;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  font-size: 1.05rem;
 }
 
-/* RATINGS */
-.ratings {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
+/* ✅ DESKTOP – kun lett begrensning */
+@media (min-width: 768px) {
+  body {
+    display: flex;
+    justify-content: center;
+  }
 
-.ratings span {
-  background: #2b2b2b;
-  padding: 7px 10px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* WATCH SECTION */
-.watch-section {
-  margin-top: 4px;
-}
-
-.watch-label,
-.watch-label-muted {
-  margin: 0 0 8px 0;
-  font-size: 0.9rem;
-  color: #c7c7c7;
-}
-
-.watch-label-muted {
-  opacity: 0.7;
-}
-
-/* PROVIDERS */
-.providers {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.provider-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #262626;
-  border-radius: 999px;
-  padding: 6px 10px;
-}
-
-.provider-item img {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: #fff;
-}
-
-.provider-item span {
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-/* JUSTWATCH LINK */
-.watch-link {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: #2a2a2a;
-  color: #fff;
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-/* SMÅ MOBILER */
-@media (max-width: 380px) {
   .container {
-    padding: 12px;
-  }
-
-  h1 {
-    font-size: 1.8rem;
-  }
-
-  input,
-  button,
-  select {
-    min-height: 60px;
-    padding: 16px 14px;
-    font-size: 1rem;
-  }
-
-  .poster {
-    width: 82px;
-    min-width: 82px;
-    height: 124px;
-  }
-
-  .card-content h3 {
-    font-size: 1rem;
-  }
-
-  .card-content p {
-    font-size: 0.92rem;
-  }
-}
-
-/* DESKTOP – kun en liten demping, ikke fokus */
-@media (min-width: 900px) {
-  .container {
-    max-width: 680px;
-    margin: 0 auto;
+    max-width: 620px;
   }
 
   .container.empty .content {
-    max-width: 680px;
+    max-width: 500px;
     margin: 0 auto;
+    justify-content: center;
   }
 }
