@@ -1,164 +1,144 @@
-/* 1. Global box-sizing er en livredder. Dette forhindrer at padding sprenger høyden/bredden. */
-*, *::before, *::after {
+/* ==========================================================================
+   1. BASE-OPPSETT
+   ========================================================================== */
+html, body, #root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  background-color: #111111 !important;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   box-sizing: border-box;
 }
 
-/* RESET */
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%; /* Endret fra min-height til height */
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #111;
-  color: #fff;
-}
-
-/* Gjør #root til en flex-container som fyller hele mobilskjermen */
 #root {
-  width: 100%;
-  min-height: 100dvh; 
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
-/* CONTAINER */
-.container {
-  width: 100%;
-  flex: 1; /* Gjør at den automatisk fyller all ledig plass i #root */
-  padding: 12px;
-  display: flex; /* Gjør container til flex, slik at barna også kan bruke flex: 1 */
-  flex-direction: column;
-  align-items: center; /* Holder innholdet sentrert */
+/* ==========================================================================
+   2. CONTAINER & LAYOUT
+   ========================================================================== */
+.container.empty {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #111111 !important;
+  padding: 0 24px !important; /* Holder sidemarginene rene og pene */
+  box-sizing: border-box !important;
 }
 
 .container.empty .content {
-  width: 100%;
-  flex: 1; /* Erstatt min-height: 100dvh med flex: 1 */
-
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* EXTREMT viktig */
-  text-align: center;
-  padding: 24px 14px 40px;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  flex-grow: 1 !important;
+  justify-content: flex-start !important;
+  /* Låser avstanden mellom knappe- og menyklyngen til en tett, solid gap */
+  gap: 20px !important; 
 }
 
-/* TITLE */
-h1 {
-  text-align: center;
-  font-size: 2.3rem;  /* ↑ ca 50% */
-  margin: 0 0 20px 0;
+/* ==========================================================================
+   3. OVERSKRIFT (Flyttet ned og forstørret)
+   ========================================================================== */
+.container.empty h1 {
+  /* 15% av den totale skjermhøyden dytter overskriften elegant ned fra bremmen */
+  margin-top: 15dvh !important; 
+  /* Solid avstand ned til det første inputfeltet */
+  margin-bottom: 25px !important; 
+  
+  font-size: 54px !important; /* Massiv, herlig tittelstørrelse */
+  font-weight: 900 !important;
+  text-align: center !important;
+  line-height: 1.1 !important;
+  letter-spacing: -1.5px !important;
 }
 
-/* FORM */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+/* ==========================================================================
+   4. FORMKONTROLLER & GRUPPERING
+   ========================================================================== */
+.container.empty form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important; /* Holder nøyaktig samme tette avstand inni formen */
+  width: 100% !important;
+  margin: 0 !important;
 }
 
-/* INPUT, BUTTON, SELECT */
-input,
-button,
-select {
-  width: 100%;
-text-align: center;
-  padding: 22px;       /* ↑ */
-  font-size: 1.25rem;  /* ↑ */
-
-  border-radius: 20px;
-  border: none;
-  box-sizing: border-box;
+/* Sørger for at dropdown-divene dine oppfører seg identisk med formen */
+.container.empty .content > div {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-/* INPUT */
-input {
-  background: #222;
-  color: #fff;
+/* Bunnteksten pushes helt til bunnen av skjermen */
+.container.empty .content > p {
+  font-size: 15px !important;
+  opacity: 0.4 !important;
+  text-align: center !important;
+  line-height: 1.4 !important;
+  margin-top: auto !important; 
+  margin-bottom: 0 !important;
+  padding-bottom: 40px !important; /* God klaring til bunnen av telefonen */
 }
 
-/* BUTTON */
-button {
-  height: 72px; /* lik + større */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  background: #e50914;
-  color: #fff;
-  font-weight: 700;
+/* Skjuler resultatboksen helt så den ikke forstyrrer marginene her */
+.container.empty .results {
+  display: none !important;
 }
 
-button:active {
-  transform: scale(0.97);
+/* ==========================================================================
+   5. ULTRA-STERE KNAPPER OG INPUTS (Ekstrem App-UX)
+   ========================================================================== */
+.container.empty input,
+.container.empty button,
+.container.empty select {
+  width: 100% !important;
+  height: 86px !important;          /* Blåst opp til 86px høyde for en skikkelig kraftig følelse */
+  border-radius: 24px !important;   /* Enda dypere, mer luksuriøse app-hjørner */
+  font-size: 24px !important;       /* Svær og ekstremt tydelig tekststørrelse */
+  font-weight: 800 !important;      /* Ekstra tung fontvekt på alt */
+  font-family: inherit !important;
+  box-sizing: border-box !important;
+  border: none !important;
+  outline: none !important;
+  text-align: center !important;
+  text-align-last: center !important;
+  
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
-/* SELECT */
-select {
-  background: #f1f1f1;
-  color: #111;
+/* Tekstfeltet og Dropdown-menyene */
+.container.empty input,
+.container.empty select {
+  background-color: #1c1c1e !important;
+  color: #ffffff !important;
+  border: 3px solid #2c2c2e !important; /* Tykkere ramme som matcher de store elementene */
 }
 
-/* HJELPETEKST */
-.helper-text {
-  text-align: center;
-  font-size: 1rem;
-  opacity: 0.7;
-  margin-top: 20px;
+.container.empty input::placeholder {
+  color: #636366 !important;
 }
 
-/* RESULTS */
-.results {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+/* De røde Netflix-knappene */
+.container.empty button {
+  background-color: #e50914 !important;
+  color: #ffffff !important;
+  cursor: pointer !important;
+  box-shadow: 0 10px 30px rgba(229, 9, 20, 0.25);
+  transition: transform 0.1s ease;
 }
 
-/* CARD */
-.card {
-  display: flex;
-  gap: 14px;
-  background: #1c1c1c;
-  border-radius: 18px;
-  padding: 14px;
-}
-
-/* POSTER */
-.poster {
-  width: 100px;      /* ↑ */
-  min-width: 100px;
-  height: 150px;     /* ↑ */
-  border-radius: 12px;
-}
-
-/* TEXT */
-.card-content h3 {
-  font-size: 1.2rem;
-}
-
-.card-content p {
-  font-size: 1.05rem;
-}
-
-/* ✅ DESKTOP – kun lett begrensning */
-@media (min-width: 768px) {
-  body {
-    display: flex;
-    justify-content: center;
-  }
-
-  .container {
-    max-width: 620px;
-  }
-
-  .container.empty .content {
-    max-width: 500px;
-    margin: 0 auto;
-    justify-content: center;
-  }
+.container.empty button:active {
+  background-color: #b80710 !important;
+  transform: scale(0.97) !important; /* Digg og responsiv sprett-effekt når du trykker */
 }
