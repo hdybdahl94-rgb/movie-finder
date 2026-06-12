@@ -20,7 +20,7 @@ html, body, #root {
 }
 
 /* ==========================================================================
-   2. CONTAINER & LAYOUT
+   2. CONTAINER & LAYOUT (Sluppet helt fri til kantene)
    ========================================================================== */
 .container.empty {
   width: 100% !important;
@@ -29,7 +29,7 @@ html, body, #root {
   display: flex !important;
   flex-direction: column !important;
   background-color: #111111 !important;
-  padding: 0 24px !important; /* Holder sidemarginene rene og pene */
+  padding: 0 24px !important; 
   box-sizing: border-box !important;
 }
 
@@ -40,24 +40,23 @@ html, body, #root {
   height: 100% !important;
   flex-grow: 1 !important;
   justify-content: flex-start !important;
-  /* Låser avstanden mellom knappe- og menyklyngen til en tett, solid gap */
-  gap: 20px !important; 
+  /* Økt gap til 24px så de massive knappene ikke føles "kvalt" */
+  gap: 24px !important; 
 }
 
 /* ==========================================================================
-   3. OVERSKRIFT (Flyttet ned og forstørret)
+   3. MASSIV OVERSKRIFT
    ========================================================================== */
 .container.empty h1 {
-  /* 15% av den totale skjermhøyden dytter overskriften elegant ned fra bremmen */
-  margin-top: 15dvh !important; 
-  /* Solid avstand ned til det første inputfeltet */
-  margin-bottom: 25px !important; 
+  /* Justert til 10% av skjermhøyden så de giga knappene under får god plass */
+  margin-top: 10dvh !important; 
+  margin-bottom: 20px !important; 
   
-  font-size: 54px !important; /* Massiv, herlig tittelstørrelse */
+  font-size: 58px !important; /* Ekstremt tung og cinematic tittel */
   font-weight: 900 !important;
   text-align: center !important;
-  line-height: 1.1 !important;
-  letter-spacing: -1.5px !important;
+  line-height: 1.05 !important;
+  letter-spacing: -2px !important;
 }
 
 /* ==========================================================================
@@ -66,12 +65,12 @@ html, body, #root {
 .container.empty form {
   display: flex !important;
   flex-direction: column !important;
-  gap: 20px !important; /* Holder nøyaktig samme tette avstand inni formen */
+  gap: 24px !important; /* Matcher gapet på utsiden perfekt */
   width: 100% !important;
   margin: 0 !important;
 }
 
-/* Sørger for at dropdown-divene dine oppfører seg identisk med formen */
+/* Nullstiller wrapper-divene til dropdown-menyene */
 .container.empty .content > div {
   width: 100% !important;
   margin: 0 !important;
@@ -80,31 +79,31 @@ html, body, #root {
 
 /* Bunnteksten pushes helt til bunnen av skjermen */
 .container.empty .content > p {
-  font-size: 15px !important;
-  opacity: 0.4 !important;
+  font-size: 16px !important;
+  opacity: 0.35 !important;
   text-align: center !important;
   line-height: 1.4 !important;
   margin-top: auto !important; 
   margin-bottom: 0 !important;
-  padding-bottom: 40px !important; /* God klaring til bunnen av telefonen */
+  padding-bottom: 40px !important; 
 }
 
-/* Skjuler resultatboksen helt så den ikke forstyrrer marginene her */
+/* Skjuler resultatboksen i denne tilstanden */
 .container.empty .results {
   display: none !important;
 }
 
 /* ==========================================================================
-   5. ULTRA-STERE KNAPPER OG INPUTS (Ekstrem App-UX)
+   5. GIGANTISKE APPFELT OG KNAPPER (Maksimal Touch-UX)
    ========================================================================== */
 .container.empty input,
 .container.empty button,
 .container.empty select {
   width: 100% !important;
-  height: 86px !important;          /* Blåst opp til 86px høyde for en skikkelig kraftig følelse */
-  border-radius: 24px !important;   /* Enda dypere, mer luksuriøse app-hjørner */
-  font-size: 24px !important;       /* Svær og ekstremt tydelig tekststørrelse */
-  font-weight: 800 !important;      /* Ekstra tung fontvekt på alt */
+  height: 96px !important;          /* Nå snakker vi! 96px høyde fyller skjermen brutalt bra */
+  border-radius: 28px !important;   /* Enda dypere og rundere hjørner for å matche den massive stilen */
+  font-size: 28px !important;       /* Giga skriftstørrelse som er umulig å misse */
+  font-weight: 900 !important;      /* Maksimal fontvekt for et kompromissløst uttrykk */
   font-family: inherit !important;
   box-sizing: border-box !important;
   border: none !important;
@@ -122,11 +121,11 @@ html, body, #root {
 .container.empty select {
   background-color: #1c1c1e !important;
   color: #ffffff !important;
-  border: 3px solid #2c2c2e !important; /* Tykkere ramme som matcher de store elementene */
+  border: 3.5px solid #2c2c2e !important; /* Tykkere ramme så det står i stil med størrelsen */
 }
 
 .container.empty input::placeholder {
-  color: #636366 !important;
+  color: #555559 !important;
 }
 
 /* De røde Netflix-knappene */
@@ -134,11 +133,11 @@ html, body, #root {
   background-color: #e50914 !important;
   color: #ffffff !important;
   cursor: pointer !important;
-  box-shadow: 0 10px 30px rgba(229, 9, 20, 0.25);
+  box-shadow: 0 12px 36px rgba(229, 9, 20, 0.3); /* Tyngre skygge for de store knappene */
   transition: transform 0.1s ease;
 }
 
 .container.empty button:active {
   background-color: #b80710 !important;
-  transform: scale(0.97) !important; /* Digg og responsiv sprett-effekt når du trykker */
+  transform: scale(0.96) !important; /* Litt mer merkbar klikk-respons siden knappen er større */
 }
