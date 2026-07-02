@@ -594,3 +594,121 @@ html, body, #root {
 .modal-justwatch-link:hover {
   background-color: #b80710 !important;
 }
+
+/* ==========================================================================
+   10. MOBILE OPTIMIZATION (< 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Larger headings */
+  .container h1 {
+    font-size: 48px !important;
+    margin-top: 8dvh !important;
+  }
+
+  /* Card content typography - larger */
+  .results > div > div:last-child h2,
+  .results > div > div:last-child h3,
+  .results > div > div:last-child strong {
+    font-size: 32px !important;
+  }
+
+  .results > div > div:last-child p:not(:has(img)) {
+    font-size: 22px !important;
+  }
+
+  .results > div > div:last-child span {
+    font-size: 20px !important;
+  }
+
+  /* Card padding and gaps */
+  .results > div {
+    padding: 28px !important;
+    column-gap: 28px !important;
+  }
+
+  .results > div > div:last-child {
+    gap: 10px !important;
+  }
+
+  /* Filter group spacing */
+  .container .filter-group {
+    gap: 32px !important;
+  }
+
+  .container .checkmark {
+    font-size: 18px !important;
+  }
+
+  /* Provider filter larger */
+  .provider-filter-toggle {
+    padding: 16px 20px !important;
+    font-size: 18px !important;
+  }
+
+  .provider-checkbox {
+    font-size: 18px !important;
+  }
+
+  .provider-checkbox input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Watched checkbox larger */
+  .watched-checkbox {
+    font-size: 18px !important;
+    margin: 8px 0 !important;
+  }
+
+  .watched-checkbox input[type="checkbox"] {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Modal typography larger */
+  .modal-info h2 {
+    font-size: 36px !important;
+  }
+
+  .modal-info h3 {
+    font-size: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .modal-section p {
+    font-size: 20px !important;
+  }
+
+  .modal-ratings p {
+    font-size: 18px !important;
+  }
+
+  .modal-provider-item span {
+    font-size: 16px !important;
+  }
+
+  /* Modal padding */
+  .modal-content {
+    padding: 40px 24px !important;
+  }
+
+  .modal-poster {
+    margin-bottom: 32px !important;
+  }
+
+  .modal-info {
+    gap: 24px !important;
+  }
+
+  .modal-section {
+    padding-top: 20px !important;
+  }
+
+  /* Buttons and inputs larger */
+  .container input,
+  .container button,
+  .container select {
+    height: 100px !important;
+    font-size: 30px !important;
+  }
+}

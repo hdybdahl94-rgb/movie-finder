@@ -42,6 +42,8 @@ export default function App() {
     const [selectedServices, setSelectedServices] = useState(new Set(STREAMING_SERVICES));
     const [showProviderFilter, setShowProviderFilter] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
+    const [seenMovieIds, setSeenMovieIds] = useState(new Set());
+    const [getOtherMovies, setGetOtherMovies] = useState(false);
 
     useEffect(() => {
         const savedModel = localStorage.getItem("model");
@@ -117,20 +119,36 @@ export default function App() {
         const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
 
         try {
+            const requestBody = {
+                input: randomInput,
+                filter,
+                model: "gemini-3.1-flash-lite"
+            };
+
+            // Send seenMovies if toggled to "other movies"
+            if (getOtherMovies) {
+                requestBody.seenMovies = Array.from(seenMovieIds);
+            }
+
             const res = await fetch("/api/recommendations", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    input: randomInput,
-                    filter,
-                    model: "gemini-3.1-flash-lite"
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await res.json();
             setResult(data);
+
+            // Track all new movie IDs in seenMovieIds
+            if (Array.isArray(data)) {
+                const newIds = new Set(seenMovieIds);
+                data.forEach(movie => {
+                    newIds.add(getMovieId(movie));
+                });
+                setSeenMovieIds(newIds);
+            }
         } catch (err) {
             console.error(err);
         } finally {
@@ -262,8 +280,11 @@ export default function App() {
                         {loading ? "Laster..." : "Finn filmer eller serier"}
                     </button>
 
-                    <button type="button" className="btn-primary" onClick={handleRandom}>
-                        Gi meg noe bra 🎬
+                    <button type="button" className="btn-primary" onClick={() => {
+                        setGetOtherMovies(!getOtherMovies);
+                        handleRandom();
+                    }}>
+                        {getOtherMovies ? "Gi meg andre filmer 🔄" : "Gi meg noe bra 🎬"}
                     </button>
                 </form>
 
@@ -338,7 +359,10 @@ export default function App() {
                                         <input
                                             type="checkbox"
                                             checked={watchedMovies.has(getMovieId(movie))}
-                                            onChange={() => handleWatchedToggle(movie)}
+                                            onChange={(e) => {
+                                                e.stopPropagation();
+                                                handleWatchedToggle(movie);
+                                            }}
                                         />
                                         <span>Sett</span>
                                     </label>
@@ -443,7 +467,10 @@ export default function App() {
                                     <input
                                         type="checkbox"
                                         checked={watchedMovies.has(getMovieId(selectedMovie))}
-                                        onChange={() => handleWatchedToggle(selectedMovie)}
+                                        onChange={(e) => {
+                                            e.stopPropagation();
+                                            handleWatchedToggle(selectedMovie);
+                                        }}
                                     />
                                     <span>Markert som sett</span>
                                 </label>
