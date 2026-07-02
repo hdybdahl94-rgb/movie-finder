@@ -179,13 +179,16 @@ export default function App() {
 
             const data = await res.json();
 
-            // APPEND new movies to existing results
+            // Filter out any duplicates (frontend safety check)
             if (Array.isArray(data)) {
-                setResult(prev => [...prev, ...data]);
+                const newMovies = data.filter(movie => !seenMovieIds.has(getMovieId(movie)));
+
+                // APPEND new unique movies to existing results
+                setResult(prev => [...prev, ...newMovies]);
 
                 // Update seenMovieIds with new movies
                 const newIds = new Set(seenMovieIds);
-                data.forEach(movie => {
+                newMovies.forEach(movie => {
                     newIds.add(getMovieId(movie));
                 });
                 setSeenMovieIds(newIds);
