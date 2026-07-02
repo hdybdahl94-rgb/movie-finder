@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { input, filter } = req.body || {};
+        const { input, filter, seenMovies } = req.body || {};
 
         const selectedFilter =
             filter === "tv" || filter === "movie" ? filter : "all";
@@ -333,7 +333,14 @@ Du er en filmassistent.
 Brukerens input:
 "${finalInput}"
 
-Oppgave:
+${
+  seenMovies && seenMovies.length > 0
+    ? `Filmer/serier som bruker allerede har sett (UNNGÅ DISSE):
+${seenMovies.map(id => `- ${id.split('|')[0]}`).join('\n')}
+
+`
+    : ""
+}Oppgave:
 1. Hvis input er en spesifikk film eller TV-serie:
    - inkluder den eksakte tittelen som første resultat
    - gi deretter 4 lignende filmer/serier

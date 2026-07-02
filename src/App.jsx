@@ -43,7 +43,7 @@ export default function App() {
     const [showProviderFilter, setShowProviderFilter] = useState(false);
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [seenMovieIds, setSeenMovieIds] = useState(new Set());
-    const [getOtherMovies, setGetOtherMovies] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     useEffect(() => {
         const savedModel = localStorage.getItem("model");
@@ -107,6 +107,7 @@ export default function App() {
 
     const handleRandom = async () => {
         setLoading(true);
+        setSeenMovieIds(new Set());
 
         const inputs = [
             "highly rated movies",
@@ -119,31 +120,24 @@ export default function App() {
         const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
 
         try {
-            const requestBody = {
-                input: randomInput,
-                filter,
-                model: "gemini-3.1-flash-lite"
-            };
-
-            // Send seenMovies if toggled to "other movies"
-            if (getOtherMovies) {
-                requestBody.seenMovies = Array.from(seenMovieIds);
-            }
-
             const res = await fetch("/api/recommendations", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify({
+                    input: randomInput,
+                    filter,
+                    model: "gemini-3.1-flash-lite"
+                })
             });
 
             const data = await res.json();
             setResult(data);
 
-            // Track all new movie IDs in seenMovieIds
+            // Track all movie IDs from initial search
             if (Array.isArray(data)) {
-                const newIds = new Set(seenMovieIds);
+                const newIds = new Set();
                 data.forEach(movie => {
                     newIds.add(getMovieId(movie));
                 });
@@ -153,6 +147,53 @@ export default function App() {
             console.error(err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleLoadMore = async () => {
+        setIsLoadingMore(true);
+
+        const inputs = [
+            "highly rated movies",
+            "best imdb movies",
+            "top rated films",
+            "critically acclaimed tv shows",
+            "top rated series"
+        ];
+
+        const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
+
+        try {
+            const res = await fetch("/api/recommendations", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    input: randomInput,
+                    filter,
+                    model: "gemini-3.1-flash-lite",
+                    seenMovies: Array.from(seenMovieIds)
+                })
+            });
+
+            const data = await res.json();
+
+            // APPEND new movies to existing results
+            if (Array.isArray(data)) {
+                setResult(prev => [...prev, ...data]);
+
+                // Update seenMovieIds with new movies
+                const newIds = new Set(seenMovieIds);
+                data.forEach(movie => {
+                    newIds.add(getMovieId(movie));
+                });
+                setSeenMovieIds(newIds);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoadingMore(false);
         }
     };
 
@@ -280,11 +321,8 @@ export default function App() {
                         {loading ? "Laster..." : "Finn filmer eller serier"}
                     </button>
 
-                    <button type="button" className="btn-primary" onClick={() => {
-                        setGetOtherMovies(!getOtherMovies);
-                        handleRandom();
-                    }}>
-                        {getOtherMovies ? "Gi meg andre filmer 🔄" : "Gi meg noe bra 🎬"}
+                    <button type="button" className="btn-primary" onClick={handleRandom}>
+                        Gi meg noe bra 🎬
                     </button>
                 </form>
 
@@ -428,6 +466,33 @@ export default function App() {
                             </div>
                         ))}
                 </div>
+
+                {/* Load More Button */}
+                {result.length > 0 && (
+                    <div style={{ textAlign: "center", marginTop: "32px", marginBottom: "32px" }}>
+                        <button
+                            type="button"
+                            onClick={handleLoadMore}
+                            disabled={isLoadingMore}
+                            style={{
+                                width: "100%",
+                                maxWidth: "500px",
+                                height: "80px",
+                                fontSize: "24px",
+                                fontWeight: "700",
+                                borderRadius: "20px",
+                                border: "2px solid #e50914",
+                                background: "transparent",
+                                color: "#e50914",
+                                cursor: isLoadingMore ? "not-allowed" : "pointer",
+                                opacity: isLoadingMore ? 0.5 : 1,
+                                transition: "all 0.15s ease"
+                            }}
+                        >
+                            {isLoadingMore ? "Laster..." : "Last flere filmer 📺"}
+                        </button>
+                    </div>
+                )}
 
                 {/* Movie Detail Modal */}
                 {selectedMovie && (
