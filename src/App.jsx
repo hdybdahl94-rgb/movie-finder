@@ -191,6 +191,7 @@ export default function App() {
                     filter,
                     model: "gemini-3.1-flash-lite",
                     seenMovies: Array.from(seenMovieIds),
+                    seenTitles: result.map(m => m.title).filter(Boolean),
                     loadMore: true
                 })
             });

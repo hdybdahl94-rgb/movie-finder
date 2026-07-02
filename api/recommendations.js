@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { input, filter, seenMovies, loadMore, model } = req.body || {};
+        const { input, filter, seenMovies, seenTitles, loadMore, model } = req.body || {};
 
         const selectedFilter =
             filter === "tv" || filter === "movie" ? filter : "all";
@@ -347,37 +347,37 @@ export default async function handler(req, res) {
             };
         };
 
-        // 1. Be Gemini foreslå titler
-        const candidateCount = loadMore ? 10 : 5;
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        // Hjelpefunksjon: hent Gemini-forslag for gitte filmtitler å unngå
+        const fetchGeminiTitles = async (avoidTitles, count) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-        const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                signal: controller.signal,
-                body: JSON.stringify({
-                    generationConfig: {
-                        responseMimeType: "application/json"
+            const geminiResponse = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
                     },
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: `
+                    signal: controller.signal,
+                    body: JSON.stringify({
+                        generationConfig: {
+                            responseMimeType: "application/json"
+                        },
+                        contents: [
+                            {
+                                parts: [
+                                    {
+                                        text: `
 Du er en filmassistent.
 
 Brukerens input:
 "${finalInput}"
 
 ${
-  seenMovies && seenMovies.length > 0
+  avoidTitles && avoidTitles.length > 0
     ? `Filmer/serier som bruker allerede har sett (UNNGÅ DISSE):
-${seenMovies.map(id => `- ${id.split('|')[0]}`).join('\n')}
+${avoidTitles.slice(-60).map(title => `- ${title}`).join('\n')}
 
 `
     : ""
@@ -387,19 +387,20 @@ ${seenMovies.map(id => `- ${id.split('|')[0]}`).join('\n')}
    - gi deretter ${loadMore ? "9" : "4"} lignende filmer/serier
 
 2. Hvis input er en generell beskrivelse:
-   - gi ${candidateCount} relevante forslag basert på ønsket
+   - gi ${count} relevante forslag basert på ønsket
 
-Gi meg ${candidateCount} ${
-                                        selectedFilter === "tv"
-                                            ? "TV-serier"
-                                            : selectedFilter === "movie"
-                                                ? "filmer"
-                                                : "filmer eller TV-serier"
-                                    }.
+Gi meg ${count} ${
+                                            selectedFilter === "tv"
+                                                ? "TV-serier"
+                                                : selectedFilter === "movie"
+                                                    ? "filmer"
+                                                    : "filmer eller TV-serier"
+                                        }.
 
 Regler:
 - Hvis TV-serier er valgt: foreslå KUN serier
 - Hvis filmer er valgt: foreslå KUN filmer
+- Foreslå KUN titler som IKKE står i lista over allerede sette
 - Første resultat skal være brukerens input hvis det er en kjent film/serie
 - Svar KUN med gyldig JSON-array
 - Ingen markdown
@@ -416,138 +417,70 @@ Format:
   }
 ]
 `
-                                }
-                            ]
-                        }
-                    ]
-                })
-            }
-        );
-
-        const rawGeminiText = await geminiResponse.text();
-        clearTimeout(timeoutId);
-
-        if (!geminiResponse.ok) {
-            console.error("Gemini HTTP error:", geminiResponse.status, rawGeminiText);
-            return res.status(500).json({
-                error: `Gemini HTTP ${geminiResponse.status}`,
-                details: rawGeminiText
-            });
-        }
-
-        let geminiData;
-
-        try {
-            geminiData = JSON.parse(rawGeminiText);
-        } catch (err) {
-            console.error("Gemini returned invalid outer JSON:", rawGeminiText);
-            return res.status(500).json({
-                error: "Gemini did not return valid JSON",
-                details: rawGeminiText
-            });
-        }
-
-        const text =
-            geminiData?.candidates?.[0]?.content?.parts
-                ?.map((part) => part.text || "")
-                .join("")
-                .trim() || "";
-
-        if (!text) {
-            console.error("Unexpected Gemini response:", geminiData);
-            return res.status(500).json({
-                error: "Gemini response had no text",
-                details: geminiData
-            });
-        }
-
-        let aiItems = [];
-
-        try {
-            // Først prøv direkte parse
-            aiItems = JSON.parse(text);
-        } catch (err) {
-            // Fallback hvis modellen likevel pakker inn tekst rundt JSON
-            const jsonText = extractJSON(text);
-
-            if (!jsonText) {
-                console.error("Could not extract JSON from Gemini text:", text);
-                return res.status(500).json({
-                    error: "Could not parse AI response",
-                    details: text
-                });
-            }
-
-            try {
-                aiItems = JSON.parse(jsonText);
-            } catch (parseErr) {
-                console.error("Could not parse extracted JSON:", jsonText);
-                return res.status(500).json({
-                    error: "Could not parse JSON from AI",
-                    details: jsonText
-                });
-            }
-        }
-
-        if (!Array.isArray(aiItems)) {
-            return res.status(500).json({
-                error: "AI response was not an array",
-                details: aiItems
-            });
-        }
-
-        // Rydd litt i respons
-        aiItems = aiItems
-            .filter((item) => item && typeof item.title === "string" && item.title.trim())
-            .slice(0, candidateCount);
-
-        // 2. Berik med TMDB + OMDb + providers (én beste match per AI-forslag)
-        let enrichedResults = await Promise.all(
-            aiItems.map(async (item) => {
-                const fallback = {
-                    tmdbId: null,
-                    mediaType:
-                        selectedFilter === "tv"
-                            ? "tv"
-                            : selectedFilter === "movie"
-                                ? "movie"
-                                : null,
-                    title: item.title,
-                    description: item.description || "Ingen beskrivelse tilgjengelig.",
-                    poster: "",
-                    year: item.year || "",
-                    tmdbScore: null,
-                    imdbScore: null,
-                    rottenTomatoes: null,
-                    providerType: null,
-                    providers: [],
-                    justWatchUrl: getJustWatchSearchUrl(item.title)
-                };
-
-                try {
-                    const tmdbResult = await searchTMDBMedia(
-                        item.title,
-                        item.year,
-                        selectedFilter
-                    );
-
-                    if (!tmdbResult) {
-                        return fallback;
-                    }
-
-                    return await buildEnrichedItem(
-                        tmdbResult.data,
-                        tmdbResult.type,
-                        item.description
-                    );
-                } catch (err) {
-                    console.error("Failed to enrich item:", item.title, err);
-                    return fallback;
+                                    }
+                                ]
+                            }
+                        ]
+                    })
                 }
-            })
-        );
+            );
 
-        // 2.5 Server-side deduplisering: fjern filmer som allerede er sett + interne duplikater
+            const rawGeminiText = await geminiResponse.text();
+            clearTimeout(timeoutId);
+
+            if (!geminiResponse.ok) {
+                console.error("Gemini HTTP error:", geminiResponse.status, rawGeminiText);
+                throw new Error(`Gemini HTTP ${geminiResponse.status}`);
+            }
+
+            let geminiData;
+            try {
+                geminiData = JSON.parse(rawGeminiText);
+            } catch (err) {
+                console.error("Gemini returned invalid outer JSON:", rawGeminiText);
+                throw new Error("Gemini did not return valid JSON");
+            }
+
+            const text =
+                geminiData?.candidates?.[0]?.content?.parts
+                    ?.map((part) => part.text || "")
+                    .join("")
+                    .trim() || "";
+
+            if (!text) {
+                console.error("Unexpected Gemini response:", geminiData);
+                throw new Error("Gemini response had no text");
+            }
+
+            let aiItems = [];
+            try {
+                aiItems = JSON.parse(text);
+            } catch (err) {
+                const jsonText = extractJSON(text);
+                if (!jsonText) {
+                    console.error("Could not extract JSON from Gemini text:", text);
+                    throw new Error("Could not parse AI response");
+                }
+                try {
+                    aiItems = JSON.parse(jsonText);
+                } catch (parseErr) {
+                    console.error("Could not parse extracted JSON:", jsonText);
+                    throw new Error("Could not parse JSON from AI");
+                }
+            }
+
+            if (!Array.isArray(aiItems)) {
+                throw new Error("AI response was not an array");
+            }
+
+            return aiItems
+                .filter((item) => item && typeof item.title === "string" && item.title.trim())
+                .slice(0, count);
+        };
+
+        // 1. Be Gemini foreslå titler
+        const candidateCount = loadMore ? 10 : 5;
+        // Setup dedup helpers
         const normalizeKey = (movie) => {
             if (movie.tmdbId) {
                 return `tmdb|${movie.tmdbId}`;
@@ -556,22 +489,135 @@ Format:
             return `title|${normalized}|${movie.mediaType}`;
         };
 
-        const seenSet = new Set(seenMovies || []);
-        const dedupedResults = [];
-        const seenKeys = new Set();
-
-        enrichedResults.forEach(movie => {
-            const newKey = normalizeKey(movie);
-            const oldKey = `${movie.title}|${movie.year}|${movie.mediaType}`;
-
-            // Skip if in seenMovies (old format from frontend) or already added in this batch
-            if (!seenSet.has(oldKey) && !seenKeys.has(newKey)) {
-                dedupedResults.push(movie);
-                seenKeys.add(newKey);
+        const getMovieId = (movie) => {
+            if (movie.tmdbId) {
+                return `tmdb|${movie.tmdbId}|${movie.mediaType}`;
             }
-        });
+            return `${movie.title}|${movie.year}|${movie.mediaType}`;
+        };
 
-        enrichedResults = dedupedResults;
+        const seenSet = new Set(seenMovies || []);
+        const seenKeys = new Set();
+        let enrichedResults = [];
+
+        // Helper to enrich a batch of AI items
+        const enrichBatch = async (aiItems) => {
+            return Promise.all(
+                aiItems.map(async (item) => {
+                    const fallback = {
+                        tmdbId: null,
+                        mediaType:
+                            selectedFilter === "tv"
+                                ? "tv"
+                                : selectedFilter === "movie"
+                                    ? "movie"
+                                    : null,
+                        title: item.title,
+                        description: item.description || "Ingen beskrivelse tilgjengelig.",
+                        poster: "",
+                        year: item.year || "",
+                        tmdbScore: null,
+                        imdbScore: null,
+                        rottenTomatoes: null,
+                        providerType: null,
+                        providers: [],
+                        justWatchUrl: getJustWatchSearchUrl(item.title)
+                    };
+
+                    try {
+                        const tmdbResult = await searchTMDBMedia(
+                            item.title,
+                            item.year,
+                            selectedFilter
+                        );
+
+                        if (!tmdbResult) {
+                            return fallback;
+                        }
+
+                        return await buildEnrichedItem(
+                            tmdbResult.data,
+                            tmdbResult.type,
+                            item.description
+                        );
+                    } catch (err) {
+                        console.error("Failed to enrich item:", item.title, err);
+                        return fallback;
+                    }
+                })
+            );
+        };
+
+        // Top-up loop for loadMore, or single call for regular search
+        if (loadMore) {
+            const collectedTitles = new Set();
+            let avoidTitles = [...(seenTitles || [])];
+            let attempts = 0;
+            const maxAttempts = 3;
+
+            while (enrichedResults.length < candidateCount && attempts < maxAttempts) {
+                try {
+                    const aiItems = await fetchGeminiTitles(avoidTitles, candidateCount);
+
+                    if (aiItems.length === 0) {
+                        console.log("Gemini returned 0 items, stopping top-up");
+                        break;
+                    }
+
+                    const batchEnriched = await enrichBatch(aiItems);
+
+                    const newMovies = [];
+                    batchEnriched.forEach(movie => {
+                        const frontendId = getMovieId(movie);
+                        const newKey = normalizeKey(movie);
+                        const movieTitle = movie.title;
+
+                        if (!seenSet.has(frontendId) && !seenKeys.has(newKey) && !collectedTitles.has(movieTitle)) {
+                            newMovies.push(movie);
+                            collectedTitles.add(movieTitle);
+                            seenKeys.add(newKey);
+                        }
+                    });
+
+                    if (newMovies.length === 0) {
+                        console.log("No new movies after dedup, stopping top-up");
+                        break;
+                    }
+
+                    enrichedResults.push(...newMovies);
+                    avoidTitles.push(...newMovies.map(m => m.title));
+
+                    attempts++;
+                } catch (err) {
+                    console.error("Gemini fetch failed on attempt", attempts + 1, ":", err);
+                    break;
+                }
+            }
+        } else {
+            // Regular search: single Gemini call
+            try {
+                const avoidTitles = seenTitles || [];
+                const aiItems = await fetchGeminiTitles(avoidTitles, candidateCount);
+
+                const batchEnriched = await enrichBatch(aiItems);
+
+                batchEnriched.forEach(movie => {
+                    const frontendId = getMovieId(movie);
+                    const newKey = normalizeKey(movie);
+
+                    if (!seenSet.has(frontendId) && !seenKeys.has(newKey)) {
+                        enrichedResults.push(movie);
+                        seenKeys.add(newKey);
+                    }
+                });
+            } catch (err) {
+                console.error("Gemini fetch failed:", err);
+                return res.status(500).json({
+                    error: err.message || "Failed to fetch recommendations",
+                    details: err.toString()
+                });
+            }
+        }
 
         // 3. Hvis bruker skrev en spesifikk tittel: legg til både film og serie hvis de finnes
         // (skipped ved "Last flere" for å unngå å legge til samme direktetreff på nytt)
