@@ -23,7 +23,22 @@ const getProviderLabel = (type) => {
 };
 
 
-const getMovieId = (movie) => `${movie.title}|${movie.year}|${movie.mediaType}`;
+const getMovieId = (movie) => {
+    if (movie.tmdbId) {
+        return `tmdb|${movie.tmdbId}|${movie.mediaType}`;
+    }
+    return `${movie.title}|${movie.year}|${movie.mediaType}`;
+};
+
+const idsFromMovies = (movies) => {
+    const ids = new Set();
+    if (Array.isArray(movies)) {
+        movies.forEach(movie => {
+            ids.add(getMovieId(movie));
+        });
+    }
+    return ids;
+};
 
 const STREAMING_SERVICES = [
     "Netflix", "Disney Plus", "Disney+", "HBO Max", "Max",
@@ -108,6 +123,7 @@ export default function App() {
 
     const handleRandom = async () => {
         setLoading(true);
+        setError("");
         setSeenMovieIds(new Set());
 
         const inputs = [
@@ -119,6 +135,7 @@ export default function App() {
         ];
 
         const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
+        setLastSearchInput(randomInput);
 
         try {
             const res = await fetch("/api/recommendations", {
@@ -134,18 +151,23 @@ export default function App() {
             });
 
             const data = await res.json();
-            setResult(data);
+
+            if (!res.ok) {
+                setError(data?.error || "Noe gikk galt ved tilfeldig valg.");
+                return;
+            }
 
             // Track all movie IDs from initial search
             if (Array.isArray(data)) {
-                const newIds = new Set();
-                data.forEach(movie => {
-                    newIds.add(getMovieId(movie));
-                });
-                setSeenMovieIds(newIds);
+                setResult(data);
+                setSeenMovieIds(idsFromMovies(data));
+            } else {
+                setError("Uventet svar fra server.");
+                setResult([]);
             }
         } catch (err) {
             console.error(err);
+            setError("Kunne ikke hente tilfeldige filmer.");
         } finally {
             setLoading(false);
         }
@@ -153,6 +175,7 @@ export default function App() {
 
     const handleLoadMore = async () => {
         setIsLoadingMore(true);
+        setError("");
 
         // Use user's last search input, or fallback to generic input
         const searchInput = lastSearchInput || "top rated movies and tv shows";
@@ -167,11 +190,17 @@ export default function App() {
                     input: searchInput,
                     filter,
                     model: "gemini-3.1-flash-lite",
-                    seenMovies: Array.from(seenMovieIds)
+                    seenMovies: Array.from(seenMovieIds),
+                    loadMore: true
                 })
             });
 
             const data = await res.json();
+
+            if (!res.ok) {
+                setError(data?.error || "Kunne ikke laste flere filmer.");
+                return;
+            }
 
             // Filter out any duplicates (frontend safety check)
             if (Array.isArray(data)) {
@@ -186,9 +215,12 @@ export default function App() {
                     newIds.add(getMovieId(movie));
                 });
                 setSeenMovieIds(newIds);
+            } else {
+                setError("Uventet svar fra server.");
             }
         } catch (err) {
             console.error(err);
+            setError("Nettverksfeil ved lasting av flere filmer.");
         } finally {
             setIsLoadingMore(false);
         }
@@ -212,7 +244,7 @@ export default function App() {
                 body: JSON.stringify({
                     input,
                     filter,
-                    model
+                    model: "gemini-3.1-flash-lite"
                 })
             });
 
@@ -223,7 +255,12 @@ export default function App() {
                 return;
             }
 
-            setResult(Array.isArray(data) ? data : []);
+            if (Array.isArray(data)) {
+                setResult(data);
+                setSeenMovieIds(idsFromMovies(data));
+            } else {
+                setResult([]);
+            }
         } catch (err) {
             console.error(err);
             setError("Kunne ikke hente data.");
@@ -356,9 +393,9 @@ export default function App() {
                             // If no providers found, don't show it
                             return false;
                         })
-                        .map((movie, index) => (
+                        .map((movie) => (
                             <div
-                                key={index}
+                                key={getMovieId(movie)}
                                 className={`card ${watchedMovies.has(getMovieId(movie)) ? "watched" : ""}`}
                                 onClick={() => setSelectedMovie(movie)}
                                 style={{ cursor: "pointer" }}
@@ -471,22 +508,9 @@ export default function App() {
                     <div style={{ textAlign: "center", marginTop: "32px", marginBottom: "32px" }}>
                         <button
                             type="button"
+                            className="load-more-button"
                             onClick={handleLoadMore}
                             disabled={isLoadingMore}
-                            style={{
-                                width: "100%",
-                                maxWidth: "500px",
-                                height: "80px",
-                                fontSize: "24px",
-                                fontWeight: "700",
-                                borderRadius: "20px",
-                                border: "2px solid #e50914",
-                                background: "transparent",
-                                color: "#e50914",
-                                cursor: isLoadingMore ? "not-allowed" : "pointer",
-                                opacity: isLoadingMore ? 0.5 : 1,
-                                transition: "all 0.15s ease"
-                            }}
                         >
                             {isLoadingMore ? "Laster..." : "Last flere filmer 📺"}
                         </button>

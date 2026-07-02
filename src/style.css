@@ -221,6 +221,26 @@ html, body, #root {
   transform: scale(0.96) !important;
 }
 
+.load-more-button {
+  width: 100% !important;
+  max-width: 500px !important;
+  height: 80px !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+  border-radius: 20px !important;
+  border: 2px solid #e50914 !important;
+  background: transparent !important;
+  color: #e50914 !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  transition: all 0.15s ease !important;
+}
+
+.load-more-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+
 /* ==========================================================================
    6. FILM- OG SERIERESULTATER (poster og tekst på samme toppnivå)
    ========================================================================== */
@@ -599,116 +619,185 @@ html, body, #root {
    10. MOBILE OPTIMIZATION (< 768px)
    ========================================================================== */
 @media (max-width: 768px) {
-  /* Larger headings */
+  /* Headings recalibrated for mobile with viewport tag */
   .container h1 {
-    font-size: 48px !important;
-    margin-top: 8dvh !important;
+    font-size: 36px !important;
+    letter-spacing: -1px !important;
+    margin-top: 6dvh !important;
   }
 
-  /* Card content typography - larger */
+  /* Card content typography - reduced */
   .results > div > div:last-child h2,
   .results > div > div:last-child h3,
   .results > div > div:last-child strong {
-    font-size: 32px !important;
+    font-size: 20px !important;
   }
 
   .results > div > div:last-child p:not(:has(img)) {
-    font-size: 22px !important;
+    font-size: 16px !important;
   }
 
   .results > div > div:last-child span {
-    font-size: 20px !important;
+    font-size: 14px !important;
   }
 
   /* Card padding and gaps */
   .results > div {
-    padding: 28px !important;
-    column-gap: 28px !important;
+    padding: 16px !important;
+    column-gap: 14px !important;
+    grid-template-columns: 110px minmax(0, 1fr) !important;
+  }
+
+  .results > div > img:first-of-type {
+    width: 110px !important;
+    height: 165px !important;
   }
 
   .results > div > div:last-child {
-    gap: 10px !important;
+    gap: 6px !important;
   }
 
   /* Filter group spacing */
   .container .filter-group {
-    gap: 32px !important;
+    gap: 20px !important;
   }
 
   .container .checkmark {
-    font-size: 18px !important;
+    font-size: 14px !important;
   }
 
-  /* Provider filter larger */
+  /* Provider filter */
   .provider-filter-toggle {
-    padding: 16px 20px !important;
-    font-size: 18px !important;
+    padding: 12px 16px !important;
+    font-size: 14px !important;
   }
 
   .provider-checkbox {
-    font-size: 18px !important;
+    font-size: 14px !important;
   }
 
   .provider-checkbox input[type="checkbox"] {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
 
-  /* Watched checkbox larger */
+  /* Watched checkbox */
   .watched-checkbox {
-    font-size: 18px !important;
-    margin: 8px 0 !important;
+    font-size: 14px !important;
+    margin: 6px 0 !important;
   }
 
   .watched-checkbox input[type="checkbox"] {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
 
-  /* Modal typography larger */
-  .modal-info h2 {
-    font-size: 36px !important;
-  }
-
-  .modal-info h3 {
-    font-size: 24px !important;
-    margin-bottom: 16px !important;
-  }
-
-  .modal-section p {
-    font-size: 20px !important;
-  }
-
-  .modal-ratings p {
-    font-size: 18px !important;
-  }
-
-  .modal-provider-item span {
-    font-size: 16px !important;
-  }
-
-  /* Modal padding */
+  /* Modal */
   .modal-content {
-    padding: 40px 24px !important;
+    max-height: 100dvh !important;
+    padding: 24px 16px !important;
+    border-radius: 12px !important;
   }
 
   .modal-poster {
-    margin-bottom: 32px !important;
+    max-height: 40vh !important;
+    margin-bottom: 16px !important;
+  }
+
+  .modal-poster img {
+    object-fit: contain !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .modal-info h2 {
+    font-size: 24px !important;
+  }
+
+  .modal-info h3 {
+    font-size: 18px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .modal-section p {
+    font-size: 16px !important;
+  }
+
+  .modal-ratings p {
+    font-size: 14px !important;
+  }
+
+  .modal-provider-item span {
+    font-size: 13px !important;
   }
 
   .modal-info {
-    gap: 24px !important;
+    gap: 16px !important;
   }
 
   .modal-section {
-    padding-top: 20px !important;
+    padding-top: 12px !important;
   }
 
-  /* Buttons and inputs larger */
+  /* Buttons and inputs - recalibrated */
   .container input,
   .container button,
   .container select {
-    height: 100px !important;
-    font-size: 30px !important;
+    height: 56px !important;
+    font-size: 16px !important;
+  }
+
+  .load-more-button {
+    height: 56px !important;
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Very small screens - further adjustments */
+  .container h1 {
+    font-size: 28px !important;
+    letter-spacing: 0 !important;
+    margin-top: 5dvh !important;
+  }
+
+  .results > div {
+    padding: 12px !important;
+    column-gap: 10px !important;
+    grid-template-columns: 90px minmax(0, 1fr) !important;
+  }
+
+  .results > div > img:first-of-type {
+    width: 90px !important;
+    height: 135px !important;
+  }
+
+  .results > div > div:last-child h2,
+  .results > div > div:last-child h3 {
+    font-size: 16px !important;
+  }
+
+  .results > div > div:last-child p:not(:has(img)) {
+    font-size: 13px !important;
+  }
+
+  .container input,
+  .container button,
+  .container select {
+    height: 48px !important;
+    font-size: 14px !important;
+  }
+
+  .load-more-button {
+    height: 48px !important;
+    font-size: 14px !important;
+  }
+
+  .modal-content {
+    padding: 16px 12px !important;
+  }
+
+  .modal-info h2 {
+    font-size: 20px !important;
   }
 }

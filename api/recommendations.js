@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { input, filter, seenMovies } = req.body || {};
+        const { input, filter, seenMovies, loadMore, model } = req.body || {};
 
         const selectedFilter =
             filter === "tv" || filter === "movie" ? filter : "all";
@@ -23,9 +23,13 @@ export default async function handler(req, res) {
             return res.status(500).json({ error: "Missing environment variables" });
         }
 
-        // Hardkodet modell siden valg fra frontend er fjernet
-        // Hvis du senere vil bytte modell, gjør det kun her:
-        const GEMINI_MODEL = "gemini-3.1-flash-lite";
+        // Valider modellvalg fra frontend
+        const ALLOWED_MODELS = [
+            "gemini-3.1-flash-lite",
+            "gemini-3.5-flash",
+            "gemini-3.1-pro-preview"
+        ];
+        const GEMINI_MODEL = ALLOWED_MODELS.includes(model) ? model : "gemini-3.1-flash-lite";
 
         const ALLOWED_PROVIDER_NAMES = [
             "Netflix",
@@ -77,9 +81,15 @@ export default async function handler(req, res) {
 
         const getTMDBExternalIds = async (type, tmdbId) => {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const response = await fetch(
-                    `https://api.themoviedb.org/3/${type}/${tmdbId}/external_ids?api_key=${TMDB_API_KEY}`
+                    `https://api.themoviedb.org/3/${type}/${tmdbId}/external_ids?api_key=${TMDB_API_KEY}`,
+                    { signal: controller.signal }
                 );
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     console.error("TMDB external_ids failed:", response.status);
@@ -105,7 +115,12 @@ export default async function handler(req, res) {
                     )}${year ? `&y=${year}` : ""}`;
                 }
 
-                const response = await fetch(url);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                const response = await fetch(url, { signal: controller.signal });
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     console.error("OMDb failed:", response.status);
@@ -121,9 +136,15 @@ export default async function handler(req, res) {
 
         const getWatchProviders = async (type, id) => {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const response = await fetch(
-                    `https://api.themoviedb.org/3/${type}/${id}/watch/providers?api_key=${TMDB_API_KEY}`
+                    `https://api.themoviedb.org/3/${type}/${id}/watch/providers?api_key=${TMDB_API_KEY}`,
+                    { signal: controller.signal }
                 );
+
+                clearTimeout(timeoutId);
 
                 if (!response.ok) {
                     console.error("TMDB watch providers failed:", response.status);
@@ -187,18 +208,25 @@ export default async function handler(req, res) {
         // Brukes for AI-forslag: velger én beste match
         const searchTMDBMedia = async (title, year, filter) => {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const [movieRes, tvRes] = await Promise.all([
                     fetch(
                         `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
                             title
-                        )}${year ? `&year=${year}` : ""}`
+                        )}${year ? `&year=${year}` : ""}`,
+                        { signal: controller.signal }
                     ),
                     fetch(
                         `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
                             title
-                        )}`
+                        )}`,
+                        { signal: controller.signal }
                     )
                 ]);
+
+                clearTimeout(timeoutId);
 
                 const movieData = movieRes.ok ? await movieRes.json() : {};
                 const tvData = tvRes.ok ? await tvRes.json() : {};
@@ -236,18 +264,25 @@ export default async function handler(req, res) {
         // Brukes kun for direkte søk på input: hent både film og serie hvis de finnes
         const searchTMDBDirectBoth = async (title) => {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
                 const [movieRes, tvRes] = await Promise.all([
                     fetch(
                         `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
                             title
-                        )}`
+                        )}`,
+                        { signal: controller.signal }
                     ),
                     fetch(
                         `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(
                             title
-                        )}`
+                        )}`,
+                        { signal: controller.signal }
                     )
                 ]);
+
+                clearTimeout(timeoutId);
 
                 const movieData = movieRes.ok ? await movieRes.json() : {};
                 const tvData = tvRes.ok ? await tvRes.json() : {};
@@ -289,6 +324,7 @@ export default async function handler(req, res) {
             const watchData = await getWatchProviders(mediaType, tmdbItem.id);
 
             return {
+                tmdbId: tmdbItem.id,
                 mediaType,
                 title: titleForOmdb,
                 description:
@@ -312,6 +348,10 @@ export default async function handler(req, res) {
         };
 
         // 1. Be Gemini foreslå titler
+        const candidateCount = loadMore ? 10 : 5;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
         const geminiResponse = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
             {
@@ -319,6 +359,7 @@ export default async function handler(req, res) {
                 headers: {
                     "Content-Type": "application/json"
                 },
+                signal: controller.signal,
                 body: JSON.stringify({
                     generationConfig: {
                         responseMimeType: "application/json"
@@ -343,12 +384,12 @@ ${seenMovies.map(id => `- ${id.split('|')[0]}`).join('\n')}
 }Oppgave:
 1. Hvis input er en spesifikk film eller TV-serie:
    - inkluder den eksakte tittelen som første resultat
-   - gi deretter 4 lignende filmer/serier
+   - gi deretter ${loadMore ? "9" : "4"} lignende filmer/serier
 
 2. Hvis input er en generell beskrivelse:
-   - gi 5 relevante forslag basert på ønsket
+   - gi ${candidateCount} relevante forslag basert på ønsket
 
-Gi meg 5 ${
+Gi meg ${candidateCount} ${
                                         selectedFilter === "tv"
                                             ? "TV-serier"
                                             : selectedFilter === "movie"
@@ -384,6 +425,7 @@ Format:
         );
 
         const rawGeminiText = await geminiResponse.text();
+        clearTimeout(timeoutId);
 
         if (!geminiResponse.ok) {
             console.error("Gemini HTTP error:", geminiResponse.status, rawGeminiText);
@@ -457,12 +499,13 @@ Format:
         // Rydd litt i respons
         aiItems = aiItems
             .filter((item) => item && typeof item.title === "string" && item.title.trim())
-            .slice(0, 5);
+            .slice(0, candidateCount);
 
         // 2. Berik med TMDB + OMDb + providers (én beste match per AI-forslag)
         let enrichedResults = await Promise.all(
             aiItems.map(async (item) => {
                 const fallback = {
+                    tmdbId: null,
                     mediaType:
                         selectedFilter === "tv"
                             ? "tv"
@@ -504,8 +547,35 @@ Format:
             })
         );
 
+        // 2.5 Server-side deduplisering: fjern filmer som allerede er sett + interne duplikater
+        const normalizeKey = (movie) => {
+            if (movie.tmdbId) {
+                return `tmdb|${movie.tmdbId}`;
+            }
+            const normalized = (movie.title || "").toLowerCase().trim();
+            return `title|${normalized}|${movie.mediaType}`;
+        };
+
+        const seenSet = new Set(seenMovies || []);
+        const dedupedResults = [];
+        const seenKeys = new Set();
+
+        enrichedResults.forEach(movie => {
+            const newKey = normalizeKey(movie);
+            const oldKey = `${movie.title}|${movie.year}|${movie.mediaType}`;
+
+            // Skip if in seenMovies (old format from frontend) or already added in this batch
+            if (!seenSet.has(oldKey) && !seenKeys.has(newKey)) {
+                dedupedResults.push(movie);
+                seenKeys.add(newKey);
+            }
+        });
+
+        enrichedResults = dedupedResults;
+
         // 3. Hvis bruker skrev en spesifikk tittel: legg til både film og serie hvis de finnes
-        if (input && input.trim().length < 50) {
+        // (skipped ved "Last flere" for å unngå å legge til samme direktetreff på nytt)
+        if (!loadMore && input && input.trim().length < 50) {
             try {
                 const directMatches = await searchTMDBDirectBoth(input.trim());
 
