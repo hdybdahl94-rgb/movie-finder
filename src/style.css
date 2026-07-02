@@ -322,3 +322,275 @@ html, body, #root {
   font-weight: 800 !important;
   color: #ffffff !important;
 }
+
+/* ==========================================================================
+   7. PROVIDER FILTER STYLING
+   ========================================================================== */
+.provider-filter-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  width: 100% !important;
+  margin-top: -12px !important;
+}
+
+.provider-filter-toggle {
+  background-color: #1c1c1e !important;
+  color: #a1a1aa !important;
+  border: 1px solid #44444a !important;
+  padding: 12px 16px !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  width: 100% !important;
+  text-align: left !important;
+  transition: all 0.15s ease !important;
+}
+
+.provider-filter-toggle:hover {
+  border-color: #e50914 !important;
+  color: #ffffff !important;
+}
+
+.provider-list {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  padding: 12px 0 !important;
+}
+
+.provider-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  color: #a1a1aa !important;
+}
+
+.provider-checkbox input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #44444a !important;
+  border-radius: 4px !important;
+  background-color: #1c1c1e !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.provider-checkbox input[type="checkbox"]:checked {
+  background-color: #e50914 !important;
+  border-color: #e50914 !important;
+}
+
+/* ==========================================================================
+   8. WATCHED MOVIES STYLING
+   ========================================================================== */
+.watched-checkbox {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  color: #a1a1aa !important;
+  margin: 4px 0 !important;
+}
+
+.watched-checkbox input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  border: 2px solid #44444a !important;
+  border-radius: 4px !important;
+  background-color: #1c1c1e !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.watched-checkbox input[type="checkbox"]:checked {
+  background-color: #4ade80 !important;
+  border-color: #4ade80 !important;
+}
+
+.watched-checkbox input[type="checkbox"]:checked::after {
+  content: "✓" !important;
+  color: #111111 !important;
+  font-weight: bold !important;
+  font-size: 12px !important;
+}
+
+.card.watched > img.poster {
+  opacity: 0.5 !important;
+  filter: grayscale(100%) !important;
+  border: 2px solid #4ade80 !important;
+}
+
+.card.watched > div:last-child h3::before {
+  content: "✓ " !important;
+  color: #4ade80 !important;
+  font-weight: bold !important;
+}
+
+/* ==========================================================================
+   9. MOVIE DETAIL MODAL STYLING
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+  padding: 16px !important;
+}
+
+.modal-content {
+  background-color: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 18px !important;
+  padding: 32px !important;
+  max-width: 600px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  width: 100% !important;
+  position: relative !important;
+}
+
+.modal-close-button {
+  position: absolute !important;
+  top: 16px !important;
+  right: 16px !important;
+  background: none !important;
+  border: none !important;
+  color: #a1a1aa !important;
+  font-size: 28px !important;
+  cursor: pointer !important;
+  padding: 8px !important;
+  transition: color 0.15s ease !important;
+}
+
+.modal-close-button:hover {
+  color: #ffffff !important;
+}
+
+.modal-poster {
+  margin-bottom: 24px !important;
+  width: 100% !important;
+}
+
+.modal-poster img {
+  width: 100% !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
+}
+
+.modal-poster .poster-fallback {
+  width: 100% !important;
+  height: 300px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: #1c1c1e !important;
+  border-radius: 12px !important;
+  color: #a1a1aa !important;
+}
+
+.modal-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.modal-info h2 {
+  font-size: 32px !important;
+  font-weight: 900 !important;
+  margin: 0 !important;
+  color: #ffffff !important;
+}
+
+.modal-info h3 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  margin: 0 0 12px 0 !important;
+  color: #ffffff !important;
+}
+
+.modal-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  border-top: 1px solid #27272a !important;
+  padding-top: 16px !important;
+}
+
+.modal-section p {
+  margin: 0 !important;
+  font-size: 18px !important;
+  color: #e4e4e7 !important;
+  line-height: 1.6 !important;
+}
+
+.modal-ratings {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.modal-ratings p {
+  font-size: 16px !important;
+  color: #a1a1aa !important;
+}
+
+.modal-providers {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 16px !important;
+  align-items: center !important;
+}
+
+.modal-provider-item {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 8px !important;
+  text-align: center !important;
+}
+
+.modal-provider-item img {
+  width: 45px !important;
+  height: auto !important;
+}
+
+.modal-provider-item span {
+  font-size: 14px !important;
+  color: #a1a1aa !important;
+}
+
+.modal-no-providers {
+  color: #a1a1aa !important;
+  font-style: italic !important;
+}
+
+.modal-justwatch-link {
+  display: inline-block !important;
+  padding: 12px 24px !important;
+  background-color: #e50914 !important;
+  color: #ffffff !important;
+  text-decoration: none !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  transition: background-color 0.15s ease !important;
+}
+
+.modal-justwatch-link:hover {
+  background-color: #b80710 !important;
+}

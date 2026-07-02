@@ -23,6 +23,14 @@ const getProviderLabel = (type) => {
 };
 
 
+const getMovieId = (movie) => `${movie.title}|${movie.year}|${movie.mediaType}`;
+
+const STREAMING_SERVICES = [
+    "Netflix", "Disney Plus", "Disney+", "HBO Max", "Max",
+    "Viaplay", "TV 2 Play", "TV2 Play", "Amazon Prime Video",
+    "Prime Video", "Apple TV Plus", "Apple TV+"
+];
+
 export default function App() {
     const [input, setInput] = useState("");
     const [result, setResult] = useState([]);
@@ -30,17 +38,70 @@ export default function App() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [filter, setFilter] = useState("all");
+    const [watchedMovies, setWatchedMovies] = useState(new Set());
+    const [selectedServices, setSelectedServices] = useState(new Set(STREAMING_SERVICES));
+    const [showProviderFilter, setShowProviderFilter] = useState(false);
+    const [selectedMovie, setSelectedMovie] = useState(null);
 
     useEffect(() => {
         const savedModel = localStorage.getItem("model");
         if (savedModel) {
             setModel(savedModel);
         }
+        const savedWatched = localStorage.getItem("watchedMovies");
+        if (savedWatched) {
+            setWatchedMovies(new Set(JSON.parse(savedWatched)));
+        }
+        const savedServices = localStorage.getItem("selectedServices");
+        if (savedServices) {
+            setSelectedServices(new Set(JSON.parse(savedServices)));
+        }
     }, []);
 
     useEffect(() => {
         localStorage.setItem("model", model);
     }, [model]);
+
+    useEffect(() => {
+        localStorage.setItem("watchedMovies", JSON.stringify(Array.from(watchedMovies)));
+    }, [watchedMovies]);
+
+    useEffect(() => {
+        localStorage.setItem("selectedServices", JSON.stringify(Array.from(selectedServices)));
+    }, [selectedServices]);
+
+    useEffect(() => {
+        const handleEscape = (e) => {
+            if (e.key === "Escape") {
+                setSelectedMovie(null);
+            }
+        };
+        if (selectedMovie) {
+            window.addEventListener("keydown", handleEscape);
+            return () => window.removeEventListener("keydown", handleEscape);
+        }
+    }, [selectedMovie]);
+
+    const handleWatchedToggle = (movie) => {
+        const id = getMovieId(movie);
+        const newWatched = new Set(watchedMovies);
+        if (newWatched.has(id)) {
+            newWatched.delete(id);
+        } else {
+            newWatched.add(id);
+        }
+        setWatchedMovies(newWatched);
+    };
+
+    const handleServiceToggle = (service, isChecked) => {
+        const newServices = new Set(selectedServices);
+        if (isChecked) {
+            newServices.add(service);
+        } else {
+            newServices.delete(service);
+        }
+        setSelectedServices(newServices);
+    };
 
     const handleRandom = async () => {
         setLoading(true);
@@ -170,6 +231,32 @@ export default function App() {
                         </label>
                     </div>
 
+                    {/* Provider Filter Section */}
+                    <div className="provider-filter-section">
+                        <button
+                            type="button"
+                            className="provider-filter-toggle"
+                            onClick={() => setShowProviderFilter(!showProviderFilter)}
+                        >
+                            {showProviderFilter ? "▼" : "▶"} Velg strømmingstjenester ({selectedServices.size}/{STREAMING_SERVICES.length})
+                        </button>
+
+                        {showProviderFilter && (
+                            <div className="provider-list">
+                                {STREAMING_SERVICES.map((service) => (
+                                    <label key={service} className="provider-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedServices.has(service)}
+                                            onChange={(e) => handleServiceToggle(service, e.target.checked)}
+                                        />
+                                        <span>{service}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
                     {/* 3. Hovedknappene */}
                     <button type="submit" disabled={loading}>
                         {loading ? "Laster..." : "Finn filmer eller serier"}
@@ -198,11 +285,26 @@ export default function App() {
                 <div className="results">
                     {result
                         .filter((movie) => {
-                            if (filter === "all") return true;
-                            return movie.mediaType === filter;
+                            // Type filter
+                            if (filter !== "all" && movie.mediaType !== filter) return false;
+
+                            // Provider filter
+                            if (movie.providers && movie.providers.length > 0) {
+                                const hasSelectedProvider = movie.providers.some((p) =>
+                                    selectedServices.has(p.provider_name)
+                                );
+                                return hasSelectedProvider;
+                            }
+                            // If no providers found, don't show it
+                            return false;
                         })
                         .map((movie, index) => (
-                            <div key={index} className="card">
+                            <div
+                                key={index}
+                                className={`card ${watchedMovies.has(getMovieId(movie)) ? "watched" : ""}`}
+                                onClick={() => setSelectedMovie(movie)}
+                                style={{ cursor: "pointer" }}
+                            >
                                 {movie.poster ? (
                                     <img
                                         src={movie.poster}
@@ -231,6 +333,15 @@ export default function App() {
                                                 : "🎬 Film"}
                                         </span>
                                     </h3>
+
+                                    <label className="watched-checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={watchedMovies.has(getMovieId(movie))}
+                                            onChange={() => handleWatchedToggle(movie)}
+                                        />
+                                        <span>Sett</span>
+                                    </label>
 
                                     <p>{movie.description}</p>
 
@@ -293,6 +404,107 @@ export default function App() {
                             </div>
                         ))}
                 </div>
+
+                {/* Movie Detail Modal */}
+                {selectedMovie && (
+                    <div
+                        className="modal-backdrop"
+                        onClick={() => setSelectedMovie(null)}
+                    >
+                        <div
+                            className="modal-content"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="modal-close-button"
+                                onClick={() => setSelectedMovie(null)}
+                            >
+                                ✕
+                            </button>
+
+                            <div className="modal-poster">
+                                {selectedMovie.poster ? (
+                                    <img
+                                        src={selectedMovie.poster}
+                                        alt={selectedMovie.title}
+                                    />
+                                ) : (
+                                    <div className="poster-fallback">Ingen plakat</div>
+                                )}
+                            </div>
+
+                            <div className="modal-info">
+                                <h2>
+                                    {selectedMovie.title}
+                                    {selectedMovie.year ? ` (${selectedMovie.year})` : ""}
+                                </h2>
+
+                                <label className="watched-checkbox">
+                                    <input
+                                        type="checkbox"
+                                        checked={watchedMovies.has(getMovieId(selectedMovie))}
+                                        onChange={() => handleWatchedToggle(selectedMovie)}
+                                    />
+                                    <span>Markert som sett</span>
+                                </label>
+
+                                <div className="modal-section">
+                                    <h3>Beskrivelse</h3>
+                                    <p>{selectedMovie.description}</p>
+                                </div>
+
+                                <div className="modal-section">
+                                    <h3>Vurderinger</h3>
+                                    <div className="modal-ratings">
+                                        {selectedMovie.imdbScore && (
+                                            <p>IMDb: {selectedMovie.imdbScore}</p>
+                                        )}
+                                        {selectedMovie.rottenTomatoes && (
+                                            <p>Rotten Tomatoes: {selectedMovie.rottenTomatoes}</p>
+                                        )}
+                                        {selectedMovie.tmdbScore && (
+                                            <p>TMDB: {selectedMovie.tmdbScore.toFixed(1)}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {selectedMovie.providers && selectedMovie.providers.length > 0 ? (
+                                    <div className="modal-section">
+                                        <h3>
+                                            {getProviderLabel(selectedMovie.providerType)}
+                                        </h3>
+                                        <div className="modal-providers">
+                                            {selectedMovie.providers.map((p) => (
+                                                <div key={p.provider_id} className="modal-provider-item">
+                                                    <img
+                                                        src={`https://image.tmdb.org/t/p/w45${p.logo_path}`}
+                                                        alt={p.provider_name}
+                                                        title={p.provider_name}
+                                                    />
+                                                    <span>{p.provider_name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="modal-section">
+                                        <p className="modal-no-providers">
+                                            Ikke funnet på streaming i Norge
+                                        </p>
+                                        <a
+                                            href={selectedMovie.justWatchUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="modal-justwatch-link"
+                                        >
+                                            Søk hos JustWatch
+                                        </a>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
