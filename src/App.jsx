@@ -44,6 +44,7 @@ export default function App() {
     const [selectedMovie, setSelectedMovie] = useState(null);
     const [seenMovieIds, setSeenMovieIds] = useState(new Set());
     const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [lastSearchInput, setLastSearchInput] = useState("");
 
     useEffect(() => {
         const savedModel = localStorage.getItem("model");
@@ -153,15 +154,8 @@ export default function App() {
     const handleLoadMore = async () => {
         setIsLoadingMore(true);
 
-        const inputs = [
-            "highly rated movies",
-            "best imdb movies",
-            "top rated films",
-            "critically acclaimed tv shows",
-            "top rated series"
-        ];
-
-        const randomInput = inputs[Math.floor(Math.random() * inputs.length)];
+        // Use user's last search input, or fallback to generic input
+        const searchInput = lastSearchInput || "top rated movies and tv shows";
 
         try {
             const res = await fetch("/api/recommendations", {
@@ -170,7 +164,7 @@ export default function App() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    input: randomInput,
+                    input: searchInput,
                     filter,
                     model: "gemini-3.1-flash-lite",
                     seenMovies: Array.from(seenMovieIds)
@@ -206,6 +200,8 @@ export default function App() {
         setLoading(true);
         setError("");
         setResult([]);
+        setLastSearchInput(input);
+        setSeenMovieIds(new Set());
 
         try {
             const res = await fetch("/api/recommendations", {
